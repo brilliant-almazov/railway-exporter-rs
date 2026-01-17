@@ -11,7 +11,7 @@
         "y": 0
       },
       "id": 1,
-      "title": "💰 Обзор",
+      "title": "Overview",
       "type": "row"
     },
     {
@@ -19,7 +19,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "С начала месяца",
+      "description": "Since billing start",
       "fieldConfig": {
         "defaults": {
           "thresholds": {
@@ -57,7 +57,7 @@
           "refId": "A"
         }
       ],
-      "title": "Потрачено",
+      "title": "Spent",
       "type": "stat"
     },
     {
@@ -65,7 +65,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "На месяц",
+      "description": "Monthly estimate",
       "fieldConfig": {
         "defaults": {
           "thresholds": {
@@ -103,7 +103,7 @@
           "refId": "A"
         }
       ],
-      "title": "Прогноз",
+      "title": "Forecast",
       "type": "stat"
     },
     {
@@ -140,7 +140,7 @@
           "refId": "A"
         }
       ],
-      "title": "В день",
+      "title": "Daily Avg",
       "type": "stat"
     },
     {
@@ -177,7 +177,7 @@
           "refId": "A"
         }
       ],
-      "title": "Дней",
+      "title": "Days",
       "type": "stat"
     },
     {
@@ -214,7 +214,7 @@
           "refId": "A"
         }
       ],
-      "title": "Осталось",
+      "title": "Left",
       "type": "stat"
     },
     {
@@ -225,7 +225,7 @@
         "y": 4
       },
       "id": 2,
-      "title": "📊 По сервисам",
+      "title": "By Service",
       "type": "row"
     },
     {
@@ -260,11 +260,11 @@
       },
       "id": 20,
       "options": {
-        "displayMode": "lcd",
+        "displayMode": "gradient",
         "minVizHeight": 10,
         "minVizWidth": 0,
         "orientation": "horizontal",
-        "showUnfilled": true
+        "showUnfilled": false
       },
       "targets": [
         {
@@ -277,7 +277,7 @@
           "refId": "A"
         }
       ],
-      "title": "Расходы по сервисам",
+      "title": "Cost by Service",
       "type": "bargauge"
     },
     {
@@ -312,9 +312,9 @@
       },
       "id": 21,
       "options": {
-        "displayMode": "lcd",
+        "displayMode": "gradient",
         "orientation": "horizontal",
-        "showUnfilled": true
+        "showUnfilled": false
       },
       "targets": [
         {
@@ -327,7 +327,7 @@
           "refId": "A"
         }
       ],
-      "title": "Прогноз по сервисам",
+      "title": "Forecast by Service",
       "type": "bargauge"
     },
     {
@@ -338,7 +338,7 @@
         "y": 13
       },
       "id": 3,
-      "title": "🖥️ Ресурсы (в $)",
+      "title": "Resources ($)",
       "type": "row"
     },
     {
@@ -370,8 +370,9 @@
       },
       "id": 30,
       "options": {
-        "displayMode": "lcd",
-        "orientation": "horizontal"
+        "displayMode": "gradient",
+        "orientation": "horizontal",
+        "showUnfilled": false
       },
       "targets": [
         {
@@ -416,8 +417,9 @@
       },
       "id": 31,
       "options": {
-        "displayMode": "lcd",
-        "orientation": "horizontal"
+        "displayMode": "gradient",
+        "orientation": "horizontal",
+        "showUnfilled": false
       },
       "targets": [
         {
@@ -430,7 +432,7 @@
           "refId": "A"
         }
       ],
-      "title": "Память",
+      "title": "Memory",
       "type": "bargauge"
     },
     {
@@ -462,8 +464,9 @@
       },
       "id": 32,
       "options": {
-        "displayMode": "lcd",
-        "orientation": "horizontal"
+        "displayMode": "gradient",
+        "orientation": "horizontal",
+        "showUnfilled": false
       },
       "targets": [
         {
@@ -476,7 +479,7 @@
           "refId": "A"
         }
       ],
-      "title": "Диск",
+      "title": "Disk",
       "type": "bargauge"
     },
     {
@@ -508,8 +511,9 @@
       },
       "id": 33,
       "options": {
-        "displayMode": "lcd",
-        "orientation": "horizontal"
+        "displayMode": "gradient",
+        "orientation": "horizontal",
+        "showUnfilled": false
       },
       "targets": [
         {
@@ -522,7 +526,7 @@
           "refId": "A"
         }
       ],
-      "title": "Сеть",
+      "title": "Network",
       "type": "bargauge"
     },
     {
@@ -533,7 +537,7 @@
         "y": 20
       },
       "id": 4,
-      "title": "📈 История",
+      "title": "History",
       "type": "row"
     },
     {
@@ -584,7 +588,7 @@
           "refId": "B"
         }
       ],
-      "title": "Расходы",
+      "title": "Spending",
       "type": "timeseries"
     },
     {
@@ -628,7 +632,7 @@
           "refId": "A"
         }
       ],
-      "title": "По сервисам",
+      "title": "By Service",
       "type": "timeseries"
     },
     {
@@ -675,7 +679,7 @@
           "refId": "A"
         }
       ],
-      "title": "Удалённые",
+      "title": "Deleted $",
       "type": "stat"
     },
     {
@@ -722,7 +726,7 @@
           "refId": "A"
         }
       ],
-      "title": "Удалённых",
+      "title": "Deleted #",
       "type": "stat"
     },
     {
@@ -767,7 +771,7 @@
           "refId": "A"
         }
       ],
-      "title": "Сервисов",
+      "title": "Services",
       "type": "stat"
     }
   ],
@@ -794,7 +798,28 @@
         "type": "query"
       },
       {
-        "allValue": "^[a-z].*",
+        "current": {
+          "text": "No",
+          "value": "^[a-z]"
+        },
+        "label": "Show Deleted",
+        "name": "show_deleted",
+        "options": [
+          {
+            "selected": true,
+            "text": "No",
+            "value": "^[a-z]"
+          },
+          {
+            "text": "Yes",
+            "value": ".*"
+          }
+        ],
+        "query": "No : ^[a-z],Yes : .*",
+        "type": "custom"
+      },
+      {
+        "allValue": ".*",
         "datasource": {
           "type": "prometheus",
           "uid": "${datasource}"
@@ -804,12 +829,12 @@
         "name": "service",
         "query": "label_values(railway_service_cost_usd, service)",
         "refresh": 2,
-        "regex": "",
+        "regex": "${show_deleted}",
         "type": "query"
       }
     ]
   },
   "title": "Railway Costs",
   "uid": "railway-costs",
-  "version": 9
+  "version": 10
 }
