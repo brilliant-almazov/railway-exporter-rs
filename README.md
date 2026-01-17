@@ -174,13 +174,17 @@ docker run -d \
 ### Docker
 
 ```bash
+# Use specific commit SHA for stability (recommended)
 docker run -d \
   --name railway-exporter \
   -p 9333:9333 \
   -e RAILWAY_API_TOKEN=your-token \
   -e RAILWAY_PROJECT_ID=your-project-id \
   -e RAILWAY_PLAN=pro \
-  ghcr.io/brilliant-almazov/railway-exporter-rs:latest
+  ghcr.io/brilliant-almazov/railway-exporter-rs:bad9874
+
+# Or use 'latest' for always up-to-date (less stable)
+# ghcr.io/brilliant-almazov/railway-exporter-rs:latest
 ```
 
 ### Deploy to Railway

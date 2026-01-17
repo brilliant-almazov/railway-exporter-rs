@@ -125,6 +125,10 @@ struct Metrics {
     current_usage: GaugeVec,
     estimated_monthly: GaugeVec,
     daily_average: GaugeVec,
+    days_in_billing_period: GaugeVec,
+    days_remaining_in_month: GaugeVec,
+    last_scrape_timestamp: GaugeVec,
+    scrape_duration_seconds: GaugeVec,
     registry: Registry,
 }
 
@@ -185,6 +189,35 @@ impl Metrics {
             &["project"],
         )
         .unwrap();
+        let days_in_billing_period = GaugeVec::new(
+            Opts::new(
+                "railway_days_in_billing_period",
+                "Days elapsed in billing period",
+            ),
+            &["project"],
+        )
+        .unwrap();
+        let days_remaining_in_month = GaugeVec::new(
+            Opts::new("railway_days_remaining_in_month", "Days remaining in month"),
+            &["project"],
+        )
+        .unwrap();
+        let last_scrape_timestamp = GaugeVec::new(
+            Opts::new(
+                "railway_exporter_last_scrape_timestamp",
+                "Timestamp of last successful scrape",
+            ),
+            &["project"],
+        )
+        .unwrap();
+        let scrape_duration_seconds = GaugeVec::new(
+            Opts::new(
+                "railway_exporter_scrape_duration_seconds",
+                "Duration of API scrape",
+            ),
+            &["project"],
+        )
+        .unwrap();
 
         registry.register(Box::new(cpu_usage.clone())).unwrap();
         registry.register(Box::new(memory_usage.clone())).unwrap();
@@ -200,6 +233,18 @@ impl Metrics {
             .register(Box::new(estimated_monthly.clone()))
             .unwrap();
         registry.register(Box::new(daily_average.clone())).unwrap();
+        registry
+            .register(Box::new(days_in_billing_period.clone()))
+            .unwrap();
+        registry
+            .register(Box::new(days_remaining_in_month.clone()))
+            .unwrap();
+        registry
+            .register(Box::new(last_scrape_timestamp.clone()))
+            .unwrap();
+        registry
+            .register(Box::new(scrape_duration_seconds.clone()))
+            .unwrap();
 
         Self {
             cpu_usage,
@@ -212,6 +257,10 @@ impl Metrics {
             current_usage,
             estimated_monthly,
             daily_average,
+            days_in_billing_period,
+            days_remaining_in_month,
+            last_scrape_timestamp,
+            scrape_duration_seconds,
             registry,
         }
     }
@@ -362,10 +411,38 @@ async fn collect_metrics(
         .estimated_monthly
         .with_label_values(&[project_name])
         .set(est_monthly);
+    let now = Utc::now();
+    let days_elapsed = now.day() as f64;
+    let days_in_month = if now.month() == 12 {
+        chrono::NaiveDate::from_ymd_opt(now.year() + 1, 1, 1)
+    } else {
+        chrono::NaiveDate::from_ymd_opt(now.year(), now.month() + 1, 1)
+    }
+    .unwrap()
+    .pred_opt()
+    .unwrap()
+    .day() as f64;
+
     metrics
         .daily_average
         .with_label_values(&[project_name])
-        .set(total_cost / Utc::now().day() as f64);
+        .set(total_cost / days_elapsed);
+    metrics
+        .days_in_billing_period
+        .with_label_values(&[project_name])
+        .set(days_elapsed);
+    metrics
+        .days_remaining_in_month
+        .with_label_values(&[project_name])
+        .set(days_in_month - days_elapsed);
+    metrics
+        .last_scrape_timestamp
+        .with_label_values(&[project_name])
+        .set(now.timestamp() as f64);
+    metrics
+        .scrape_duration_seconds
+        .with_label_values(&[project_name])
+        .set(start.elapsed().as_secs_f64());
 
     info!(
         "Collected in {:.2}s. Current: ${:.2}, Estimated: ${:.2}/month",
@@ -427,7 +504,10 @@ async fn main() {
                 let metrics = metrics.clone();
                 async move {
                     let resp = match req.uri().path() {
-                        "/metrics" => Response::new(Full::new(Bytes::from(metrics.encode()))),
+                        "/metrics" => Response::builder()
+                            .header("Content-Type", "text/plain; version=0.0.4; charset=utf-8")
+                            .body(Full::new(Bytes::from(metrics.encode())))
+                            .unwrap(),
                         "/health" => Response::new(Full::new(Bytes::from("ok"))),
                         _ => Response::builder()
                             .status(StatusCode::NOT_FOUND)
