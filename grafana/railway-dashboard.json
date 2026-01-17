@@ -239,6 +239,7 @@
           "color": {
             "mode": "palette-classic"
           },
+          "decimals": 4,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -259,7 +260,7 @@
       },
       "id": 20,
       "options": {
-        "displayMode": "gradient",
+        "displayMode": "lcd",
         "minVizHeight": 10,
         "minVizWidth": 0,
         "orientation": "horizontal",
@@ -290,6 +291,7 @@
           "color": {
             "mode": "palette-classic"
           },
+          "decimals": 4,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -310,7 +312,7 @@
       },
       "id": 21,
       "options": {
-        "displayMode": "gradient",
+        "displayMode": "lcd",
         "orientation": "horizontal",
         "showUnfilled": true
       },
@@ -347,6 +349,7 @@
       "description": "$0.000463/vCPU-мин",
       "fieldConfig": {
         "defaults": {
+          "decimals": 4,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -367,7 +370,7 @@
       },
       "id": 30,
       "options": {
-        "displayMode": "basic",
+        "displayMode": "lcd",
         "orientation": "horizontal"
       },
       "targets": [
@@ -392,6 +395,7 @@
       "description": "$0.000231/GB-мин",
       "fieldConfig": {
         "defaults": {
+          "decimals": 4,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -412,7 +416,7 @@
       },
       "id": 31,
       "options": {
-        "displayMode": "basic",
+        "displayMode": "lcd",
         "orientation": "horizontal"
       },
       "targets": [
@@ -437,6 +441,7 @@
       "description": "$0.000021/GB-мин",
       "fieldConfig": {
         "defaults": {
+          "decimals": 4,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -457,7 +462,7 @@
       },
       "id": 32,
       "options": {
-        "displayMode": "basic",
+        "displayMode": "lcd",
         "orientation": "horizontal"
       },
       "targets": [
@@ -482,6 +487,7 @@
       "description": "$0.10/GB исходящий",
       "fieldConfig": {
         "defaults": {
+          "decimals": 4,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -502,7 +508,7 @@
       },
       "id": 33,
       "options": {
-        "displayMode": "basic",
+        "displayMode": "lcd",
         "orientation": "horizontal"
       },
       "targets": [
@@ -718,6 +724,51 @@
       ],
       "title": "Удалённых",
       "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        }
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 15,
+        "y": 1
+      },
+      "id": 17,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "count(railway_service_cost_usd{project=~\"$project\", service=~\"$service\"})",
+          "legendFormat": " ",
+          "refId": "A"
+        }
+      ],
+      "title": "Сервисов",
+      "type": "stat"
     }
   ],
   "refresh": "1m",
@@ -743,29 +794,7 @@
         "type": "query"
       },
       {
-        "current": {
-          "text": "Yes",
-          "value": "^[a-z]"
-        },
-        "label": "Скрыть удалённые",
-        "name": "hide_deleted",
-        "options": [
-          {
-            "selected": true,
-            "text": "Yes",
-            "value": "^[a-z]"
-          },
-          {
-            "selected": false,
-            "text": "No",
-            "value": ".*"
-          }
-        ],
-        "query": "Yes : ^[a-z],No : .*",
-        "type": "custom"
-      },
-      {
-        "allValue": ".*",
+        "allValue": "^[a-z].*",
         "datasource": {
           "type": "prometheus",
           "uid": "${datasource}"
@@ -775,12 +804,12 @@
         "name": "service",
         "query": "label_values(railway_service_cost_usd, service)",
         "refresh": 2,
-        "regex": "${hide_deleted}",
+        "regex": "",
         "type": "query"
       }
     ]
   },
   "title": "Railway Costs",
   "uid": "railway-costs",
-  "version": 8
+  "version": 9
 }
