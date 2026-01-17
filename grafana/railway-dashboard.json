@@ -11,7 +11,7 @@
         "y": 0
       },
       "id": 1,
-      "title": "Overview",
+      "title": "💰 Обзор",
       "type": "row"
     },
     {
@@ -19,7 +19,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Since billing start",
+      "description": "С начала месяца",
       "fieldConfig": {
         "defaults": {
           "thresholds": {
@@ -65,7 +65,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Monthly estimate",
+      "description": "На месяц",
       "fieldConfig": {
         "defaults": {
           "thresholds": {
@@ -140,7 +140,7 @@
           "refId": "A"
         }
       ],
-      "title": "Daily Avg",
+      "title": "В день",
       "type": "stat"
     },
     {
@@ -177,7 +177,7 @@
           "refId": "A"
         }
       ],
-      "title": "Days",
+      "title": "Дней",
       "type": "stat"
     },
     {
@@ -214,7 +214,7 @@
           "refId": "A"
         }
       ],
-      "title": "Left",
+      "title": "Осталось",
       "type": "stat"
     },
     {
@@ -225,7 +225,7 @@
         "y": 4
       },
       "id": 2,
-      "title": "By Service",
+      "title": "📊 По сервисам",
       "type": "row"
     },
     {
@@ -239,7 +239,6 @@
           "color": {
             "mode": "palette-classic"
           },
-          "decimals": 4,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -264,7 +263,7 @@
         "minVizHeight": 10,
         "minVizWidth": 0,
         "orientation": "horizontal",
-        "showUnfilled": false
+        "showUnfilled": true
       },
       "targets": [
         {
@@ -291,7 +290,6 @@
           "color": {
             "mode": "palette-classic"
           },
-          "decimals": 4,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -314,7 +312,7 @@
       "options": {
         "displayMode": "gradient",
         "orientation": "horizontal",
-        "showUnfilled": false
+        "showUnfilled": true
       },
       "targets": [
         {
@@ -327,7 +325,7 @@
           "refId": "A"
         }
       ],
-      "title": "Forecast by Service",
+      "title": "Forecast по сервисам",
       "type": "bargauge"
     },
     {
@@ -338,7 +336,7 @@
         "y": 13
       },
       "id": 3,
-      "title": "Resources ($)",
+      "title": "🖥️ Ресурсы (в $)",
       "type": "row"
     },
     {
@@ -349,7 +347,6 @@
       "description": "$0.000463/vCPU-мин",
       "fieldConfig": {
         "defaults": {
-          "decimals": 4,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -370,9 +367,8 @@
       },
       "id": 30,
       "options": {
-        "displayMode": "gradient",
-        "orientation": "horizontal",
-        "showUnfilled": false
+        "displayMode": "basic",
+        "orientation": "horizontal"
       },
       "targets": [
         {
@@ -396,7 +392,6 @@
       "description": "$0.000231/GB-мин",
       "fieldConfig": {
         "defaults": {
-          "decimals": 4,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -417,9 +412,8 @@
       },
       "id": 31,
       "options": {
-        "displayMode": "gradient",
-        "orientation": "horizontal",
-        "showUnfilled": false
+        "displayMode": "basic",
+        "orientation": "horizontal"
       },
       "targets": [
         {
@@ -443,7 +437,6 @@
       "description": "$0.000021/GB-мин",
       "fieldConfig": {
         "defaults": {
-          "decimals": 4,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -464,9 +457,8 @@
       },
       "id": 32,
       "options": {
-        "displayMode": "gradient",
-        "orientation": "horizontal",
-        "showUnfilled": false
+        "displayMode": "basic",
+        "orientation": "horizontal"
       },
       "targets": [
         {
@@ -490,7 +482,6 @@
       "description": "$0.10/GB исходящий",
       "fieldConfig": {
         "defaults": {
-          "decimals": 4,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -511,9 +502,8 @@
       },
       "id": 33,
       "options": {
-        "displayMode": "gradient",
-        "orientation": "horizontal",
-        "showUnfilled": false
+        "displayMode": "basic",
+        "orientation": "horizontal"
       },
       "targets": [
         {
@@ -537,7 +527,7 @@
         "y": 20
       },
       "id": 4,
-      "title": "History",
+      "title": "📈 История",
       "type": "row"
     },
     {
@@ -588,7 +578,7 @@
           "refId": "B"
         }
       ],
-      "title": "Spending",
+      "title": "Расходы",
       "type": "timeseries"
     },
     {
@@ -632,7 +622,7 @@
           "refId": "A"
         }
       ],
-      "title": "By Service",
+      "title": "По сервисам",
       "type": "timeseries"
     },
     {
@@ -679,7 +669,7 @@
           "refId": "A"
         }
       ],
-      "title": "Deleted $",
+      "title": "Удалённые",
       "type": "stat"
     },
     {
@@ -726,52 +716,7 @@
           "refId": "A"
         }
       ],
-      "title": "Deleted #",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${datasource}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "decimals": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "blue",
-                "value": null
-              }
-            ]
-          }
-        }
-      },
-      "gridPos": {
-        "h": 3,
-        "w": 3,
-        "x": 15,
-        "y": 1
-      },
-      "id": 17,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "textMode": "value"
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "count(railway_service_cost_usd{project=~\"$project\", service=~\"$service\"})",
-          "legendFormat": " ",
-          "refId": "A"
-        }
-      ],
-      "title": "Services",
+      "title": "Удалённых",
       "type": "stat"
     }
   ],
@@ -799,23 +744,24 @@
       },
       {
         "current": {
-          "text": "No",
+          "text": "Yes",
           "value": "^[a-z]"
         },
-        "label": "Show Deleted",
-        "name": "show_deleted",
+        "label": "Скрыть удалённые",
+        "name": "hide_deleted",
         "options": [
           {
             "selected": true,
-            "text": "No",
+            "text": "Yes",
             "value": "^[a-z]"
           },
           {
-            "text": "Yes",
+            "selected": false,
+            "text": "No",
             "value": ".*"
           }
         ],
-        "query": "No : ^[a-z],Yes : .*",
+        "query": "Yes : ^[a-z],No : .*",
         "type": "custom"
       },
       {
@@ -829,12 +775,12 @@
         "name": "service",
         "query": "label_values(railway_service_cost_usd, service)",
         "refresh": 2,
-        "regex": "${show_deleted}",
+        "regex": "${hide_deleted}",
         "type": "query"
       }
     ]
   },
   "title": "Railway Costs",
   "uid": "railway-costs",
-  "version": 10
+  "version": 16
 }
