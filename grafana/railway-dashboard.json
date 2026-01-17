@@ -95,7 +95,7 @@
       "gridPos": { "h": 2, "w": 2, "x": 17, "y": 1 },
       "id": 50,
       "options": { "colorMode": "value", "graphMode": "none", "textMode": "value", "justifyMode": "center" },
-      "targets": [{ "expr": "sum(railway_cpu_usage_vcpu_minutes{project=~\"$project\"}) / (railway_days_in_billing_period{project=~\"$project\"} * 24 * 60)", "legendFormat": " " }],
+      "targets": [{ "expr": "sum(railway_cpu_usage_vcpu_minutes{project=~\"$project\"}) / on() group_left() (railway_days_in_billing_period{project=~\"$project\"} * 24 * 60)", "legendFormat": " " }],
       "title": "vCPU",
       "type": "stat"
     },
@@ -106,7 +106,7 @@
       "gridPos": { "h": 2, "w": 2, "x": 17, "y": 3 },
       "id": 51,
       "options": { "colorMode": "value", "graphMode": "none", "textMode": "value", "justifyMode": "center" },
-      "targets": [{ "expr": "sum(railway_memory_usage_gb_minutes{project=~\"$project\"}) / (railway_days_in_billing_period{project=~\"$project\"} * 24 * 60)", "legendFormat": " " }],
+      "targets": [{ "expr": "sum(railway_memory_usage_gb_minutes{project=~\"$project\"}) / on() group_left() (railway_days_in_billing_period{project=~\"$project\"} * 24 * 60)", "legendFormat": " " }],
       "title": "RAM",
       "type": "stat"
     },
@@ -117,7 +117,7 @@
       "gridPos": { "h": 2, "w": 2, "x": 19, "y": 1 },
       "id": 52,
       "options": { "colorMode": "value", "graphMode": "none", "textMode": "value" },
-      "targets": [{ "expr": "sum(railway_disk_usage_gb_minutes{project=~\"$project\"}) / (railway_days_in_billing_period{project=~\"$project\"} * 24 * 60)", "legendFormat": " " }],
+      "targets": [{ "expr": "sum(railway_disk_usage_gb_minutes{project=~\"$project\"}) / on() group_left() (railway_days_in_billing_period{project=~\"$project\"} * 24 * 60)", "legendFormat": " " }],
       "title": "Disk",
       "type": "stat"
     },
@@ -181,7 +181,7 @@
         "legendFormat": "{{icon}} {{service}}"
       }],
       "title": "CPU (vCPU)",
-      "transformations": [{ "id": "sortBy", "options": { "fields": {}, "sort": [{ "desc": true }] } }],
+      "transformations": [{ "id": "sortBy", "options": { "sort": [{ "field": "Value", "desc": true }] } }],
       "type": "bargauge"
     },
     {
@@ -206,7 +206,7 @@
         "legendFormat": "{{icon}} {{service}}"
       }],
       "title": "Memory (GB)",
-      "transformations": [{ "id": "sortBy", "options": { "fields": {}, "sort": [{ "desc": true }] } }],
+      "transformations": [{ "id": "sortBy", "options": { "sort": [{ "field": "Value", "desc": true }] } }],
       "type": "bargauge"
     },
     {
@@ -231,7 +231,7 @@
         "legendFormat": "{{icon}} {{service}}"
       }],
       "title": "Disk (GB)",
-      "transformations": [{ "id": "sortBy", "options": { "fields": {}, "sort": [{ "desc": true }] } }],
+      "transformations": [{ "id": "sortBy", "options": { "sort": [{ "field": "Value", "desc": true }] } }],
       "type": "bargauge"
     },
     {
@@ -256,7 +256,7 @@
         "legendFormat": "{{icon}} {{service}}"
       }],
       "title": "Network (GB)",
-      "transformations": [{ "id": "sortBy", "options": { "fields": {}, "sort": [{ "desc": true }] } }],
+      "transformations": [{ "id": "sortBy", "options": { "sort": [{ "field": "Value", "desc": true }] } }],
       "type": "bargauge"
     },
     {
@@ -290,7 +290,7 @@
         "legendFormat": "{{icon}} {{service}}"
       }],
       "title": "Cost by Service",
-      "transformations": [{ "id": "sortBy", "options": { "fields": {}, "sort": [{ "desc": true }] } }],
+      "transformations": [{ "id": "sortBy", "options": { "sort": [{ "field": "Value", "desc": true }] } }],
       "type": "bargauge"
     },
     {
@@ -318,7 +318,7 @@
         "legendFormat": "{{icon}} {{service}}"
       }],
       "title": "Forecast by Service",
-      "transformations": [{ "id": "sortBy", "options": { "fields": {}, "sort": [{ "desc": true }] } }],
+      "transformations": [{ "id": "sortBy", "options": { "sort": [{ "field": "Value", "desc": true }] } }],
       "type": "bargauge"
     },
     {
