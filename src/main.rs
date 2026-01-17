@@ -336,7 +336,11 @@ async fn collect_metrics(
         .map(|e| {
             let name = e.node.name.clone();
             let icon = e.node.icon.clone().unwrap_or_default();
-            let group = config.service_groups.get(&name).cloned().unwrap_or_else(|| "ungrouped".to_string());
+            let group = config
+                .service_groups
+                .get(&name)
+                .cloned()
+                .unwrap_or_else(|| "ungrouped".to_string());
             (e.node.id.clone(), (name, icon, group))
         })
         .collect();
@@ -557,11 +561,15 @@ mod tests {
 
     #[test]
     fn test_parse_service_groups_valid_json() {
-        let json = r#"{"monitoring":["grafana","victoria-metrics"],"databases":["postgres","valkey"]}"#;
+        let json =
+            r#"{"monitoring":["grafana","victoria-metrics"],"databases":["postgres","valkey"]}"#;
         let groups = parse_service_groups(json);
 
         assert_eq!(groups.get("grafana"), Some(&"monitoring".to_string()));
-        assert_eq!(groups.get("victoria-metrics"), Some(&"monitoring".to_string()));
+        assert_eq!(
+            groups.get("victoria-metrics"),
+            Some(&"monitoring".to_string())
+        );
         assert_eq!(groups.get("postgres"), Some(&"databases".to_string()));
         assert_eq!(groups.get("valkey"), Some(&"databases".to_string()));
     }
