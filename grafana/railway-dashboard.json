@@ -66,7 +66,7 @@
       "gridPos": { "h": 4, "w": 2, "x": 12, "y": 1 },
       "id": 54,
       "options": { "colorMode": "value", "graphMode": "none", "textMode": "value" },
-      "targets": [{ "expr": "count(railway_service_cost_usd{project=~\"$project\", service!~\"^[0-9a-f]{8}-.*\"})", "legendFormat": " " }],
+      "targets": [{ "expr": "count(railway_service_cost_usd{project=~\"$project\", group=~\"$group\", service!~\"^[0-9a-f]{8}-.*\"})", "legendFormat": " " }],
       "title": "Services",
       "type": "stat"
     },
@@ -179,7 +179,7 @@
       "id": 70,
       "options": { "displayMode": "basic", "orientation": "horizontal" },
       "targets": [{
-        "expr": "railway_cpu_usage_vcpu_minutes{project=~\"$project\", service!~\"${hide_deleted}\"} / ignoring(service) group_left() (railway_days_in_billing_period{project=~\"$project\"} * 24 * 60)",
+        "expr": "railway_cpu_usage_vcpu_minutes{project=~\"$project\", group=~\"$group\", service!~\"${hide_deleted}\"} / ignoring(service,group,icon) group_left() (railway_days_in_billing_period{project=~\"$project\"} * 24 * 60)",
         "legendFormat": "{{icon}} {{service}}"
       }],
       "title": "CPU (vCPU)",
@@ -204,7 +204,7 @@
       "id": 71,
       "options": { "displayMode": "basic", "orientation": "horizontal" },
       "targets": [{
-        "expr": "railway_memory_usage_gb_minutes{project=~\"$project\", service!~\"${hide_deleted}\"} / ignoring(service) group_left() (railway_days_in_billing_period{project=~\"$project\"} * 24 * 60)",
+        "expr": "railway_memory_usage_gb_minutes{project=~\"$project\", group=~\"$group\", service!~\"${hide_deleted}\"} / ignoring(service,group,icon) group_left() (railway_days_in_billing_period{project=~\"$project\"} * 24 * 60)",
         "legendFormat": "{{icon}} {{service}}"
       }],
       "title": "Memory (GB)",
@@ -229,7 +229,7 @@
       "id": 72,
       "options": { "displayMode": "basic", "orientation": "horizontal" },
       "targets": [{
-        "expr": "railway_disk_usage_gb_minutes{project=~\"$project\", service!~\"${hide_deleted}\"} / ignoring(service) group_left() (railway_days_in_billing_period{project=~\"$project\"} * 24 * 60)",
+        "expr": "railway_disk_usage_gb_minutes{project=~\"$project\", group=~\"$group\", service!~\"${hide_deleted}\"} / ignoring(service,group,icon) group_left() (railway_days_in_billing_period{project=~\"$project\"} * 24 * 60)",
         "legendFormat": "{{icon}} {{service}}"
       }],
       "title": "Disk (GB)",
@@ -254,7 +254,7 @@
       "id": 73,
       "options": { "displayMode": "basic", "orientation": "horizontal" },
       "targets": [{
-        "expr": "railway_network_tx_gb{project=~\"$project\", service!~\"${hide_deleted}\"}",
+        "expr": "railway_network_tx_gb{project=~\"$project\", group=~\"$group\", service!~\"${hide_deleted}\"}",
         "legendFormat": "{{icon}} {{service}}"
       }],
       "title": "Network (GB)",
@@ -288,7 +288,7 @@
         "showUnfilled": true
       },
       "targets": [{
-        "expr": "railway_service_cost_usd{project=~\"$project\", service!~\"${hide_deleted}\"}",
+        "expr": "railway_service_cost_usd{project=~\"$project\", group=~\"$group\", service!~\"${hide_deleted}\"}",
         "legendFormat": "{{icon}} {{service}}"
       }],
       "title": "Cost by Service",
@@ -316,7 +316,7 @@
         "showUnfilled": true
       },
       "targets": [{
-        "expr": "railway_service_estimated_monthly_usd{project=~\"$project\", service!~\"${hide_deleted}\"}",
+        "expr": "railway_service_estimated_monthly_usd{project=~\"$project\", group=~\"$group\", service!~\"${hide_deleted}\"}",
         "legendFormat": "{{icon}} {{service}}"
       }],
       "title": "Forecast by Service",
@@ -369,7 +369,7 @@
         "legend": { "calcs": ["last"], "displayMode": "table", "placement": "right", "sortBy": "Last", "sortDesc": true }
       },
       "targets": [{
-        "expr": "railway_service_cost_usd{project=~\"$project\", service!~\"${hide_deleted}\"}",
+        "expr": "railway_service_cost_usd{project=~\"$project\", group=~\"$group\", service!~\"${hide_deleted}\"}",
         "legendFormat": "{{icon}} {{service}}"
       }],
       "title": "By Service",
@@ -396,6 +396,16 @@
         "type": "query"
       },
       {
+        "allValue": ".*",
+        "datasource": { "type": "prometheus", "uid": "${datasource}" },
+        "includeAll": true,
+        "name": "group",
+        "label": "Group",
+        "query": "label_values(railway_service_cost_usd{project=~\"$project\"}, group)",
+        "refresh": 2,
+        "type": "query"
+      },
+      {
         "current": { "text": "Yes", "value": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$" },
         "label": "Hide Deleted",
         "name": "hide_deleted",
@@ -410,5 +420,5 @@
   },
   "title": "Railway Costs",
   "uid": "railway-costs",
-  "version": 20
+  "version": 21
 }

@@ -26,6 +26,21 @@ struct Config {
     plan: String,
     scrape_interval: u64,
     port: u16,
+    /// Maps service name to group name
+    service_groups: HashMap<String, String>,
+}
+
+/// Parse SERVICE_GROUPS env var: {"group_name": ["service1", "service2"]}
+fn parse_service_groups(json: &str) -> HashMap<String, String> {
+    let mut result = HashMap::new();
+    if let Ok(groups) = serde_json::from_str::<HashMap<String, Vec<String>>>(json) {
+        for (group, services) in groups {
+            for service in services {
+                result.insert(service, group.clone());
+            }
+        }
+    }
+    result
 }
 
 fn get_price(plan: &str, measurement: &str) -> f64 {
@@ -139,32 +154,32 @@ impl Metrics {
 
         let cpu_usage = GaugeVec::new(
             Opts::new("railway_cpu_usage_vcpu_minutes", "CPU usage"),
-            &["service", "project", "icon"],
+            &["service", "project", "icon", "group"],
         )
         .unwrap();
         let memory_usage = GaugeVec::new(
             Opts::new("railway_memory_usage_gb_minutes", "Memory usage"),
-            &["service", "project", "icon"],
+            &["service", "project", "icon", "group"],
         )
         .unwrap();
         let disk_usage = GaugeVec::new(
             Opts::new("railway_disk_usage_gb_minutes", "Disk usage"),
-            &["service", "project", "icon"],
+            &["service", "project", "icon", "group"],
         )
         .unwrap();
         let network_tx = GaugeVec::new(
             Opts::new("railway_network_tx_gb", "Network TX"),
-            &["service", "project", "icon"],
+            &["service", "project", "icon", "group"],
         )
         .unwrap();
         let network_rx = GaugeVec::new(
             Opts::new("railway_network_rx_gb", "Network RX"),
-            &["service", "project", "icon"],
+            &["service", "project", "icon", "group"],
         )
         .unwrap();
         let service_cost = GaugeVec::new(
             Opts::new("railway_service_cost_usd", "Service cost"),
-            &["service", "project", "icon"],
+            &["service", "project", "icon", "group"],
         )
         .unwrap();
         let service_estimated_monthly = GaugeVec::new(
@@ -172,7 +187,7 @@ impl Metrics {
                 "railway_service_estimated_monthly_usd",
                 "Service estimated monthly",
             ),
-            &["service", "project", "icon"],
+            &["service", "project", "icon", "group"],
         )
         .unwrap();
         let current_usage = GaugeVec::new(
@@ -312,12 +327,18 @@ async fn collect_metrics(
     );
     let project_data: ProjectData = graphql_query(client, &config.api_token, &query).await?;
     let project_name = &project_data.project.name;
-    let services: HashMap<String, (String, String)> = project_data
+    // (name, icon, group)
+    let services: HashMap<String, (String, String, String)> = project_data
         .project
         .services
         .edges
         .iter()
-        .map(|e| (e.node.id.clone(), (e.node.name.clone(), e.node.icon.clone().unwrap_or_default())))
+        .map(|e| {
+            let name = e.node.name.clone();
+            let icon = e.node.icon.clone().unwrap_or_default();
+            let group = config.service_groups.get(&name).cloned().unwrap_or_else(|| "ungrouped".to_string());
+            (e.node.id.clone(), (name, icon, group))
+        })
         .collect();
 
     let query = format!(
@@ -336,8 +357,8 @@ async fn collect_metrics(
 
     let mut total_cost = 0.0;
     for (sid, measurements) in &service_usage {
-        let default_svc = (sid.clone(), String::new());
-        let (name, icon) = services.get(sid).unwrap_or(&default_svc);
+        let default_svc = (sid.clone(), String::new(), "ungrouped".to_string());
+        let (name, icon, group) = services.get(sid).unwrap_or(&default_svc);
         let cpu = *measurements.get("CPU_USAGE").unwrap_or(&0.0);
         let mem = *measurements.get("MEMORY_USAGE_GB").unwrap_or(&0.0);
         let disk = *measurements.get("DISK_USAGE_GB").unwrap_or(&0.0);
@@ -346,23 +367,23 @@ async fn collect_metrics(
 
         metrics
             .cpu_usage
-            .with_label_values(&[name, project_name, icon])
+            .with_label_values(&[name, project_name, icon, group])
             .set(cpu);
         metrics
             .memory_usage
-            .with_label_values(&[name, project_name, icon])
+            .with_label_values(&[name, project_name, icon, group])
             .set(mem);
         metrics
             .disk_usage
-            .with_label_values(&[name, project_name, icon])
+            .with_label_values(&[name, project_name, icon, group])
             .set(disk);
         metrics
             .network_tx
-            .with_label_values(&[name, project_name, icon])
+            .with_label_values(&[name, project_name, icon, group])
             .set(tx);
         metrics
             .network_rx
-            .with_label_values(&[name, project_name, icon])
+            .with_label_values(&[name, project_name, icon, group])
             .set(rx);
 
         let cost = cpu * get_price(&config.plan, "CPU_USAGE")
@@ -371,7 +392,7 @@ async fn collect_metrics(
             + tx * get_price(&config.plan, "NETWORK_TX_GB");
         metrics
             .service_cost
-            .with_label_values(&[name, project_name, icon])
+            .with_label_values(&[name, project_name, icon, group])
             .set(cost);
         total_cost += cost;
     }
@@ -389,8 +410,8 @@ async fn collect_metrics(
 
     if total_cost > 0.0 {
         for (sid, measurements) in &service_usage {
-            let default_svc = (sid.clone(), String::new());
-            let (name, icon) = services.get(sid).unwrap_or(&default_svc);
+            let default_svc = (sid.clone(), String::new(), "ungrouped".to_string());
+            let (name, icon, group) = services.get(sid).unwrap_or(&default_svc);
             let cost = measurements.get("CPU_USAGE").unwrap_or(&0.0)
                 * get_price(&config.plan, "CPU_USAGE")
                 + measurements.get("MEMORY_USAGE_GB").unwrap_or(&0.0)
@@ -401,7 +422,7 @@ async fn collect_metrics(
                     * get_price(&config.plan, "NETWORK_TX_GB");
             metrics
                 .service_estimated_monthly
-                .with_label_values(&[name, project_name, icon])
+                .with_label_values(&[name, project_name, icon, group])
                 .set(est_monthly * cost / total_cost);
         }
     }
@@ -460,6 +481,10 @@ async fn collect_metrics(
 async fn main() {
     tracing_subscriber::fmt::init();
 
+    let service_groups = env::var("SERVICE_GROUPS")
+        .map(|s| parse_service_groups(&s))
+        .unwrap_or_default();
+
     let config = Config {
         api_token: env::var("RAILWAY_API_TOKEN").expect("RAILWAY_API_TOKEN required"),
         project_id: env::var("RAILWAY_PROJECT_ID").expect("RAILWAY_PROJECT_ID required"),
@@ -472,6 +497,7 @@ async fn main() {
             .unwrap_or_else(|_| "9333".to_string())
             .parse()
             .unwrap_or(9333),
+        service_groups,
     };
 
     info!("Using {} plan pricing", config.plan);
@@ -522,5 +548,58 @@ async fn main() {
             });
             let _ = http1::Builder::new().serve_connection(io, svc).await;
         });
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_parse_service_groups_valid_json() {
+        let json = r#"{"monitoring":["grafana","victoria-metrics"],"databases":["postgres","valkey"]}"#;
+        let groups = parse_service_groups(json);
+
+        assert_eq!(groups.get("grafana"), Some(&"monitoring".to_string()));
+        assert_eq!(groups.get("victoria-metrics"), Some(&"monitoring".to_string()));
+        assert_eq!(groups.get("postgres"), Some(&"databases".to_string()));
+        assert_eq!(groups.get("valkey"), Some(&"databases".to_string()));
+    }
+
+    #[test]
+    fn test_parse_service_groups_empty_json() {
+        let json = "{}";
+        let groups = parse_service_groups(json);
+        assert!(groups.is_empty());
+    }
+
+    #[test]
+    fn test_parse_service_groups_invalid_json() {
+        let json = "not valid json";
+        let groups = parse_service_groups(json);
+        assert!(groups.is_empty());
+    }
+
+    #[test]
+    fn test_parse_service_groups_empty_string() {
+        let json = "";
+        let groups = parse_service_groups(json);
+        assert!(groups.is_empty());
+    }
+
+    #[test]
+    fn test_parse_service_groups_single_group() {
+        let json = r#"{"infra":["tailscale"]}"#;
+        let groups = parse_service_groups(json);
+
+        assert_eq!(groups.len(), 1);
+        assert_eq!(groups.get("tailscale"), Some(&"infra".to_string()));
+    }
+
+    #[test]
+    fn test_parse_service_groups_empty_group() {
+        let json = r#"{"empty":[]}"#;
+        let groups = parse_service_groups(json);
+        assert!(groups.is_empty());
     }
 }
