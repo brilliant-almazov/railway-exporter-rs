@@ -427,7 +427,10 @@ async fn main() {
                 let metrics = metrics.clone();
                 async move {
                     let resp = match req.uri().path() {
-                        "/metrics" => Response::new(Full::new(Bytes::from(metrics.encode()))),
+                        "/metrics" => Response::builder()
+                            .header("Content-Type", "text/plain; version=0.0.4; charset=utf-8")
+                            .body(Full::new(Bytes::from(metrics.encode())))
+                            .unwrap(),
                         "/health" => Response::new(Full::new(Bytes::from("ok"))),
                         _ => Response::builder()
                             .status(StatusCode::NOT_FOUND)
