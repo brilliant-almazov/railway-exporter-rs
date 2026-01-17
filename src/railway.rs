@@ -127,6 +127,8 @@ pub struct ServiceNode {
     pub id: String,
     /// Service name.
     pub name: String,
+    /// Service icon (emoji or URL).
+    pub icon: Option<String>,
 }
 
 /// Usage data response.
@@ -279,7 +281,7 @@ impl RailwayClient {
     /// Project data with services list.
     pub async fn get_project(&self, project_id: &str) -> Result<Project, ApiError> {
         let query = format!(
-            r#"{{ project(id: "{}") {{ name services {{ edges {{ node {{ id name }} }} }} }} }}"#,
+            r#"{{ project(id: "{}") {{ name services {{ edges {{ node {{ id name icon }} }} }} }} }}"#,
             project_id
         );
         let data: ProjectData = self.query(&query).await?;

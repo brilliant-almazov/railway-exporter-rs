@@ -14,20 +14,14 @@
       "description": "Month to date spending",
       "fieldConfig": {
         "defaults": {
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [{ "color": "green", "value": null }]
-          },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
           "unit": "currencyUSD"
         }
       },
       "gridPos": { "h": 4, "w": 3, "x": 0, "y": 1 },
       "id": 10,
       "options": { "colorMode": "value", "graphMode": "none", "textMode": "value" },
-      "targets": [{
-        "expr": "railway_current_usage_usd{project=~\"$project\"}",
-        "legendFormat": " "
-      }],
+      "targets": [{ "expr": "railway_current_usage_usd{project=~\"$project\"}", "legendFormat": " " }],
       "title": "Spent",
       "type": "stat"
     },
@@ -36,20 +30,14 @@
       "description": "Projected monthly total",
       "fieldConfig": {
         "defaults": {
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [{ "color": "yellow", "value": null }]
-          },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "yellow", "value": null }] },
           "unit": "currencyUSD"
         }
       },
       "gridPos": { "h": 4, "w": 3, "x": 3, "y": 1 },
       "id": 11,
       "options": { "colorMode": "value", "graphMode": "none", "textMode": "value" },
-      "targets": [{
-        "expr": "railway_estimated_monthly_usd{project=~\"$project\"}",
-        "legendFormat": " "
-      }],
+      "targets": [{ "expr": "railway_estimated_monthly_usd{project=~\"$project\"}", "legendFormat": " " }],
       "title": "Forecast",
       "type": "stat"
     },
@@ -57,42 +45,11 @@
       "datasource": { "type": "prometheus", "uid": "${datasource}" },
       "description": "Average daily cost",
       "fieldConfig": { "defaults": { "unit": "currencyUSD", "decimals": 2 } },
-      "gridPos": { "h": 4, "w": 2, "x": 6, "y": 1 },
+      "gridPos": { "h": 4, "w": 3, "x": 6, "y": 1 },
       "id": 12,
       "options": { "colorMode": "none", "graphMode": "none", "textMode": "value" },
-      "targets": [{
-        "expr": "railway_daily_average_usd{project=~\"$project\"}",
-        "legendFormat": " "
-      }],
+      "targets": [{ "expr": "railway_daily_average_usd{project=~\"$project\"}", "legendFormat": " " }],
       "title": "Per Day",
-      "type": "stat"
-    },
-    {
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "description": "Days elapsed in billing period",
-      "fieldConfig": { "defaults": { "decimals": 0 } },
-      "gridPos": { "h": 4, "w": 2, "x": 8, "y": 1 },
-      "id": 13,
-      "options": { "colorMode": "none", "graphMode": "none", "textMode": "value" },
-      "targets": [{
-        "expr": "railway_days_in_billing_period{project=~\"$project\"}",
-        "legendFormat": " "
-      }],
-      "title": "Day",
-      "type": "stat"
-    },
-    {
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "description": "Days remaining until billing reset",
-      "fieldConfig": { "defaults": { "decimals": 0 } },
-      "gridPos": { "h": 4, "w": 2, "x": 10, "y": 1 },
-      "id": 14,
-      "options": { "colorMode": "none", "graphMode": "none", "textMode": "value" },
-      "targets": [{
-        "expr": "railway_days_remaining_in_month{project=~\"$project\"}",
-        "legendFormat": " "
-      }],
-      "title": "Left",
       "type": "stat"
     },
     {
@@ -100,218 +57,161 @@
       "description": "Active services count",
       "fieldConfig": {
         "defaults": {
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [{ "color": "blue", "value": null }]
-          },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }] },
           "decimals": 0
         }
       },
-      "gridPos": { "h": 4, "w": 2, "x": 12, "y": 1 },
+      "gridPos": { "h": 4, "w": 5, "x": 9, "y": 1 },
       "id": 54,
       "options": { "colorMode": "value", "graphMode": "none", "textMode": "value" },
-      "targets": [{
-        "expr": "count(railway_service_cost_usd{project=~\"$project\", service!~\"^[0-9a-f]{8}-.*\"})",
-        "legendFormat": " "
-      }],
+      "targets": [{ "expr": "count(railway_service_cost_usd{project=~\"$project\", service!~\"^[0-9a-f]{8}-.*\"})", "legendFormat": " " }],
       "title": "Services",
       "type": "stat"
     },
     {
       "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "description": "Cost of deleted services (UUID names)",
-      "fieldConfig": {
-        "defaults": {
-          "decimals": 2,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [{ "color": "dark-red", "value": null }]
-          },
-          "unit": "currencyUSD"
-        }
-      },
-      "gridPos": { "h": 4, "w": 2, "x": 14, "y": 1 },
-      "id": 15,
+      "fieldConfig": { "defaults": { "decimals": 0 } },
+      "gridPos": { "h": 2, "w": 3, "x": 14, "y": 1 },
+      "id": 13,
+      "options": { "colorMode": "none", "graphMode": "none", "textMode": "value", "justifyMode": "center" },
+      "targets": [{ "expr": "railway_days_in_billing_period{project=~\"$project\"}", "legendFormat": " " }],
+      "title": "Day",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "decimals": 0 } },
+      "gridPos": { "h": 2, "w": 3, "x": 14, "y": 3 },
+      "id": 14,
+      "options": { "colorMode": "none", "graphMode": "none", "textMode": "value", "justifyMode": "center" },
+      "targets": [{ "expr": "railway_days_in_billing_period{project=~\"$project\"} + railway_days_remaining_in_month{project=~\"$project\"}", "legendFormat": " " }],
+      "title": "Total",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "description": "Average vCPU",
+      "fieldConfig": { "defaults": { "decimals": 2, "thresholds": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }] } } },
+      "gridPos": { "h": 2, "w": 2, "x": 17, "y": 1 },
+      "id": 50,
+      "options": { "colorMode": "value", "graphMode": "none", "textMode": "value", "justifyMode": "center" },
+      "targets": [{ "expr": "sum(railway_cpu_usage_vcpu_minutes{project=~\"$project\"}) / (railway_days_in_billing_period{project=~\"$project\"} * 24 * 60)", "legendFormat": " " }],
+      "title": "vCPU",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "description": "Average RAM GB",
+      "fieldConfig": { "defaults": { "decimals": 2, "thresholds": { "mode": "absolute", "steps": [{ "color": "purple", "value": null }] } } },
+      "gridPos": { "h": 2, "w": 2, "x": 17, "y": 3 },
+      "id": 51,
+      "options": { "colorMode": "value", "graphMode": "none", "textMode": "value", "justifyMode": "center" },
+      "targets": [{ "expr": "sum(railway_memory_usage_gb_minutes{project=~\"$project\"}) / (railway_days_in_billing_period{project=~\"$project\"} * 24 * 60)", "legendFormat": " " }],
+      "title": "RAM",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "description": "Average Disk GB",
+      "fieldConfig": { "defaults": { "decimals": 1, "unit": "decgbytes", "thresholds": { "mode": "absolute", "steps": [{ "color": "orange", "value": null }] } } },
+      "gridPos": { "h": 2, "w": 2, "x": 19, "y": 1 },
+      "id": 52,
       "options": { "colorMode": "value", "graphMode": "none", "textMode": "value" },
-      "targets": [{
-        "expr": "sum(railway_service_cost_usd{project=~\"$project\", service=~\"^[0-9a-f]{8}-.*\"}) or vector(0)",
-        "legendFormat": " "
-      }],
-      "title": "Deleted $",
+      "targets": [{ "expr": "sum(railway_disk_usage_gb_minutes{project=~\"$project\"}) / (railway_days_in_billing_period{project=~\"$project\"} * 24 * 60)", "legendFormat": " " }],
+      "title": "Disk",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "description": "Network TX",
+      "fieldConfig": { "defaults": { "decimals": 2, "unit": "decgbytes", "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] } } },
+      "gridPos": { "h": 2, "w": 2, "x": 19, "y": 3 },
+      "id": 53,
+      "options": { "colorMode": "value", "graphMode": "none", "textMode": "value" },
+      "targets": [{ "expr": "sum(railway_network_tx_gb{project=~\"$project\"})", "legendFormat": " " }],
+      "title": "Net TX",
       "type": "stat"
     },
     {
       "datasource": { "type": "prometheus", "uid": "${datasource}" },
       "description": "Number of deleted services",
-      "fieldConfig": {
-        "defaults": {
-          "decimals": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [{ "color": "dark-red", "value": null }]
-          }
-        }
-      },
-      "gridPos": { "h": 4, "w": 2, "x": 16, "y": 1 },
+      "fieldConfig": { "defaults": { "decimals": 0, "thresholds": { "mode": "absolute", "steps": [{ "color": "dark-red", "value": null }] } } },
+      "gridPos": { "h": 2, "w": 3, "x": 21, "y": 1 },
       "id": 16,
       "options": { "colorMode": "value", "graphMode": "none", "textMode": "value" },
-      "targets": [{
-        "expr": "count(railway_service_cost_usd{project=~\"$project\", service=~\"^[0-9a-f]{8}-.*\"}) or vector(0)",
-        "legendFormat": " "
-      }],
+      "targets": [{ "expr": "count(railway_service_cost_usd{project=~\"$project\", service=~\"^[0-9a-f]{8}-.*\"}) or vector(0)", "legendFormat": " " }],
       "title": "Deleted #",
       "type": "stat"
     },
     {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "description": "Cost of deleted services",
+      "fieldConfig": { "defaults": { "decimals": 2, "unit": "currencyUSD", "thresholds": { "mode": "absolute", "steps": [{ "color": "dark-red", "value": null }] } } },
+      "gridPos": { "h": 2, "w": 3, "x": 21, "y": 3 },
+      "id": 15,
+      "options": { "colorMode": "value", "graphMode": "none", "textMode": "value" },
+      "targets": [{ "expr": "sum(railway_service_cost_usd{project=~\"$project\", service=~\"^[0-9a-f]{8}-.*\"}) or vector(0)", "legendFormat": " " }],
+      "title": "Deleted $",
+      "type": "stat"
+    },
+    {
       "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 },
-      "id": 60,
-      "title": "🖥️ Resources (Total)",
+      "id": 2,
+      "title": "📊 By Service (Avg Resources)",
       "type": "row"
     },
     {
       "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "description": "Total vCPU-minutes consumed",
+      "description": "Average vCPU per service",
       "fieldConfig": {
         "defaults": {
+          "color": { "mode": "palette-classic" },
           "thresholds": {
             "mode": "absolute",
             "steps": [{ "color": "blue", "value": null }]
           },
-          "decimals": 0
+          "decimals": 2
         }
       },
-      "gridPos": { "h": 3, "w": 3, "x": 0, "y": 6 },
-      "id": 50,
-      "options": { "colorMode": "value", "graphMode": "none", "textMode": "value" },
+      "gridPos": { "h": 8, "w": 6, "x": 0, "y": 6 },
+      "id": 70,
+      "options": { "displayMode": "basic", "orientation": "horizontal" },
       "targets": [{
-        "expr": "sum(railway_cpu_usage_vcpu_minutes{project=~\"$project\"})",
-        "legendFormat": " "
+        "expr": "railway_cpu_usage_vcpu_minutes{project=~\"$project\", service!~\"${hide_deleted}\"} / ignoring(service) group_left() (railway_days_in_billing_period{project=~\"$project\"} * 24 * 60)",
+        "legendFormat": "{{icon}} {{service}}"
       }],
-      "title": "vCPU-min",
-      "type": "stat"
+      "title": "CPU (vCPU)",
+      "transformations": [{ "id": "sortBy", "options": { "fields": {}, "sort": [{ "desc": true }] } }],
+      "type": "bargauge"
     },
     {
       "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "description": "Total memory GB-minutes consumed",
+      "description": "Average memory per service",
       "fieldConfig": {
         "defaults": {
+          "color": { "mode": "palette-classic" },
           "thresholds": {
             "mode": "absolute",
             "steps": [{ "color": "purple", "value": null }]
-          },
-          "decimals": 0
-        }
-      },
-      "gridPos": { "h": 3, "w": 3, "x": 3, "y": 6 },
-      "id": 51,
-      "options": { "colorMode": "value", "graphMode": "none", "textMode": "value" },
-      "targets": [{
-        "expr": "sum(railway_memory_usage_gb_minutes{project=~\"$project\"})",
-        "legendFormat": " "
-      }],
-      "title": "RAM GB-min",
-      "type": "stat"
-    },
-    {
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "description": "Total disk GB-minutes consumed",
-      "fieldConfig": {
-        "defaults": {
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [{ "color": "orange", "value": null }]
-          },
-          "decimals": 0
-        }
-      },
-      "gridPos": { "h": 3, "w": 3, "x": 6, "y": 6 },
-      "id": 52,
-      "options": { "colorMode": "value", "graphMode": "none", "textMode": "value" },
-      "targets": [{
-        "expr": "sum(railway_disk_usage_gb_minutes{project=~\"$project\"})",
-        "legendFormat": " "
-      }],
-      "title": "Disk GB-min",
-      "type": "stat"
-    },
-    {
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "description": "Total egress network traffic",
-      "fieldConfig": {
-        "defaults": {
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [{ "color": "green", "value": null }]
           },
           "decimals": 2,
           "unit": "decgbytes"
         }
       },
-      "gridPos": { "h": 3, "w": 3, "x": 9, "y": 6 },
-      "id": 53,
-      "options": { "colorMode": "value", "graphMode": "none", "textMode": "value" },
-      "targets": [{
-        "expr": "sum(railway_network_tx_gb{project=~\"$project\"})",
-        "legendFormat": " "
-      }],
-      "title": "Network TX",
-      "type": "stat"
-    },
-    {
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 9 },
-      "id": 2,
-      "title": "📊 By Service (physical)",
-      "type": "row"
-    },
-    {
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "description": "vCPU-minutes per service",
-      "fieldConfig": {
-        "defaults": {
-          "color": { "mode": "palette-classic" },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [{ "color": "blue", "value": null }]
-          },
-          "decimals": 0
-        }
-      },
-      "gridPos": { "h": 8, "w": 6, "x": 0, "y": 10 },
-      "id": 70,
-      "options": { "displayMode": "basic", "orientation": "horizontal" },
-      "targets": [{
-        "expr": "sort_desc(railway_cpu_usage_vcpu_minutes{project=~\"$project\", service=~\"${hide_deleted}\"})",
-        "legendFormat": "{{service}}"
-      }],
-      "title": "CPU (vCPU-min)",
-      "type": "bargauge"
-    },
-    {
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "description": "Memory GB-minutes per service",
-      "fieldConfig": {
-        "defaults": {
-          "color": { "mode": "palette-classic" },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [{ "color": "purple", "value": null }]
-          },
-          "decimals": 0
-        }
-      },
-      "gridPos": { "h": 8, "w": 6, "x": 6, "y": 10 },
+      "gridPos": { "h": 8, "w": 6, "x": 6, "y": 6 },
       "id": 71,
       "options": { "displayMode": "basic", "orientation": "horizontal" },
       "targets": [{
-        "expr": "sort_desc(railway_memory_usage_gb_minutes{project=~\"$project\", service=~\"${hide_deleted}\"})",
-        "legendFormat": "{{service}}"
+        "expr": "railway_memory_usage_gb_minutes{project=~\"$project\", service!~\"${hide_deleted}\"} / ignoring(service) group_left() (railway_days_in_billing_period{project=~\"$project\"} * 24 * 60)",
+        "legendFormat": "{{icon}} {{service}}"
       }],
-      "title": "Memory (GB-min)",
+      "title": "Memory (GB)",
+      "transformations": [{ "id": "sortBy", "options": { "fields": {}, "sort": [{ "desc": true }] } }],
       "type": "bargauge"
     },
     {
       "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "description": "Disk GB-minutes per service",
+      "description": "Average disk per service",
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "palette-classic" },
@@ -319,17 +219,19 @@
             "mode": "absolute",
             "steps": [{ "color": "orange", "value": null }]
           },
-          "decimals": 0
+          "decimals": 1,
+          "unit": "decgbytes"
         }
       },
-      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 10 },
+      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 6 },
       "id": 72,
       "options": { "displayMode": "basic", "orientation": "horizontal" },
       "targets": [{
-        "expr": "sort_desc(railway_disk_usage_gb_minutes{project=~\"$project\", service=~\"${hide_deleted}\"})",
-        "legendFormat": "{{service}}"
+        "expr": "railway_disk_usage_gb_minutes{project=~\"$project\", service!~\"${hide_deleted}\"} / ignoring(service) group_left() (railway_days_in_billing_period{project=~\"$project\"} * 24 * 60)",
+        "legendFormat": "{{icon}} {{service}}"
       }],
-      "title": "Disk (GB-min)",
+      "title": "Disk (GB)",
+      "transformations": [{ "id": "sortBy", "options": { "fields": {}, "sort": [{ "desc": true }] } }],
       "type": "bargauge"
     },
     {
@@ -346,18 +248,19 @@
           "unit": "decgbytes"
         }
       },
-      "gridPos": { "h": 8, "w": 6, "x": 18, "y": 10 },
+      "gridPos": { "h": 8, "w": 6, "x": 18, "y": 6 },
       "id": 73,
       "options": { "displayMode": "basic", "orientation": "horizontal" },
       "targets": [{
-        "expr": "sort_desc(railway_network_tx_gb{project=~\"$project\", service=~\"${hide_deleted}\"})",
-        "legendFormat": "{{service}}"
+        "expr": "railway_network_tx_gb{project=~\"$project\", service!~\"${hide_deleted}\"}",
+        "legendFormat": "{{icon}} {{service}}"
       }],
       "title": "Network (GB)",
+      "transformations": [{ "id": "sortBy", "options": { "fields": {}, "sort": [{ "desc": true }] } }],
       "type": "bargauge"
     },
     {
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 18 },
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 14 },
       "id": 3,
       "title": "💵 By Service ($)",
       "type": "row"
@@ -375,7 +278,7 @@
           "unit": "currencyUSD"
         }
       },
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 19 },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 15 },
       "id": 20,
       "options": {
         "displayMode": "gradient",
@@ -383,10 +286,11 @@
         "showUnfilled": true
       },
       "targets": [{
-        "expr": "sort_desc(railway_service_cost_usd{project=~\"$project\", service=~\"${hide_deleted}\"})",
-        "legendFormat": "{{service}}"
+        "expr": "railway_service_cost_usd{project=~\"$project\", service!~\"${hide_deleted}\"}",
+        "legendFormat": "{{icon}} {{service}}"
       }],
       "title": "Cost by Service",
+      "transformations": [{ "id": "sortBy", "options": { "fields": {}, "sort": [{ "desc": true }] } }],
       "type": "bargauge"
     },
     {
@@ -402,7 +306,7 @@
           "unit": "currencyUSD"
         }
       },
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 19 },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 15 },
       "id": 21,
       "options": {
         "displayMode": "gradient",
@@ -410,14 +314,15 @@
         "showUnfilled": true
       },
       "targets": [{
-        "expr": "sort_desc(railway_service_estimated_monthly_usd{project=~\"$project\", service=~\"${hide_deleted}\"})",
-        "legendFormat": "{{service}}"
+        "expr": "railway_service_estimated_monthly_usd{project=~\"$project\", service!~\"${hide_deleted}\"}",
+        "legendFormat": "{{icon}} {{service}}"
       }],
       "title": "Forecast by Service",
+      "transformations": [{ "id": "sortBy", "options": { "fields": {}, "sort": [{ "desc": true }] } }],
       "type": "bargauge"
     },
     {
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 27 },
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 23 },
       "id": 4,
       "title": "📈 Trends",
       "type": "row"
@@ -430,7 +335,7 @@
           "unit": "currencyUSD"
         }
       },
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 28 },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 24 },
       "id": 40,
       "options": {
         "legend": { "displayMode": "list", "placement": "bottom" }
@@ -456,14 +361,14 @@
           "unit": "currencyUSD"
         }
       },
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 28 },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 24 },
       "id": 41,
       "options": {
         "legend": { "calcs": ["last"], "displayMode": "table", "placement": "right" }
       },
       "targets": [{
-        "expr": "railway_service_cost_usd{project=~\"$project\", service=~\"${hide_deleted}\"}",
-        "legendFormat": "{{service}}"
+        "expr": "railway_service_cost_usd{project=~\"$project\", service!~\"${hide_deleted}\"}",
+        "legendFormat": "{{icon}} {{service}}"
       }],
       "title": "By Service",
       "type": "timeseries"
@@ -489,14 +394,14 @@
         "type": "query"
       },
       {
-        "current": { "text": "Yes", "value": "^[a-z]" },
+        "current": { "text": "Yes", "value": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$" },
         "label": "Hide Deleted",
         "name": "hide_deleted",
         "options": [
-          { "selected": true, "text": "Yes", "value": "^[a-z]" },
-          { "selected": false, "text": "No", "value": ".*" }
+          { "selected": true, "text": "Yes", "value": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$" },
+          { "selected": false, "text": "No", "value": "^$" }
         ],
-        "query": "Yes : ^[a-z],No : .*",
+        "query": "Yes : ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$,No : ^$",
         "type": "custom"
       }
     ]
