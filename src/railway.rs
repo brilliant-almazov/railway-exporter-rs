@@ -64,8 +64,7 @@ use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-/// Railway GraphQL API URL.
-pub const API_URL: &str = "https://backboard.railway.app/graphql/v2";
+use crate::config::DEFAULT_API_URL;
 
 /// GraphQL request body.
 #[derive(Debug, Serialize)]
@@ -219,6 +218,7 @@ impl std::error::Error for ApiError {}
 pub struct RailwayClient {
     client: Client,
     token: String,
+    api_url: String,
 }
 
 impl RailwayClient {
@@ -227,10 +227,12 @@ impl RailwayClient {
     /// # Arguments
     ///
     /// * `token` - Railway API token
-    pub fn new(token: &str) -> Self {
+    /// * `api_url` - Optional API URL (defaults to Railway's GraphQL endpoint)
+    pub fn new(token: &str, api_url: Option<&str>) -> Self {
         Self {
             client: Client::new(),
             token: token.to_string(),
+            api_url: api_url.unwrap_or(DEFAULT_API_URL).to_string(),
         }
     }
 
@@ -246,7 +248,7 @@ impl RailwayClient {
     pub async fn query<T: for<'de> Deserialize<'de>>(&self, query: &str) -> Result<T, ApiError> {
         let resp = self
             .client
-            .post(API_URL)
+            .post(&self.api_url)
             .header("Authorization", format!("Bearer {}", self.token))
             .header("Content-Type", "application/json")
             .json(&GraphQLRequest {
@@ -373,8 +375,16 @@ mod tests {
 
     #[test]
     fn test_railway_client_new() {
-        let client = RailwayClient::new("test-token");
+        let client = RailwayClient::new("test-token", None);
         assert_eq!(client.token, "test-token");
+        assert_eq!(client.api_url, DEFAULT_API_URL);
+    }
+
+    #[test]
+    fn test_railway_client_custom_url() {
+        let client = RailwayClient::new("test-token", Some("https://custom.api/graphql"));
+        assert_eq!(client.token, "test-token");
+        assert_eq!(client.api_url, "https://custom.api/graphql");
     }
 
     #[test]

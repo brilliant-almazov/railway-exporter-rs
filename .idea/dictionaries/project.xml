@@ -1,6 +1,9 @@
 <component name="ProjectDictionaryState">
   <dictionary name="project">
     <words>
+      <w>rabbitmq</w>
+      <w>tailscale</w>
+      <w>valkey</w>
       <w>vcpu</w>
     </words>
   </dictionary>

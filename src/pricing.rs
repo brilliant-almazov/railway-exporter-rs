@@ -13,6 +13,7 @@
 //! | Egress | $0.10/GB | $0.10/GB |
 
 use std::collections::HashMap;
+use serde::Serialize;
 
 /// Default pricing for Hobby plan (per unit).
 pub const HOBBY_PRICES: &[(&str, f64)] = &[
@@ -47,7 +48,7 @@ pub const PRO_PRICES: &[(&str, f64)] = &[
 /// assert_eq!(config.get_price("CPU_USAGE"), 0.0003);
 /// assert_eq!(config.get_price("MEMORY_USAGE_GB"), 0.000116); // Default Pro price
 /// ```
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct PricingConfig {
     plan: String,
     overrides: HashMap<String, f64>,
