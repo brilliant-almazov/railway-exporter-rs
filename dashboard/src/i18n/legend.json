@@ -1,0 +1,299 @@
+{
+  "ru": {
+    "legendTitle": "Что означают метрики?",
+    "cost": {
+      "title": "Стоимость",
+      "items": [
+        {"dt": "Cost", "dd": "Текущие расходы за биллинг-период (в USD)"},
+        {"dt": "Forecast", "dd": "Прогноз на месяц при текущем потреблении"}
+      ]
+    },
+    "resources": {
+      "title": "Ресурсы",
+      "items": [
+        {"dt": "CPU (min)", "dd": "vCPU-минуты = ядра × время", "ex": "2 ядра × 30 мин = 60"},
+        {"dt": "RAM (GB·min)", "dd": "Память × время", "ex": "4 GB × 60 мин = 240"},
+        {"dt": "Disk (GB·min)", "dd": "Диск × время использования", "ex": "10 GB × 1440 мин"}
+      ]
+    },
+    "averages": {
+      "title": "Средние",
+      "items": [
+        {"dt": "Avg vCPU", "dd": "Среднее число ядер", "ex": "0.5 = пол-ядра"},
+        {"dt": "Avg RAM", "dd": "Средняя память в GB", "ex": "0.25 = 256 MB"},
+        {"dt": "Avg Disk", "dd": "Средний размер диска в GB"}
+      ]
+    },
+    "network": {
+      "title": "Сеть",
+      "items": [
+        {"dt": "TX (GB)", "dd": "Исходящий трафик — платный"},
+        {"dt": "RX (GB)", "dd": "Входящий трафик — бесплатный"}
+      ]
+    }
+  },
+  "en": {
+    "legendTitle": "What do metrics mean?",
+    "cost": {
+      "title": "Cost",
+      "items": [
+        {"dt": "Cost", "dd": "Current billing period cost (USD)"},
+        {"dt": "Forecast", "dd": "Projected monthly cost"}
+      ]
+    },
+    "resources": {
+      "title": "Resources",
+      "items": [
+        {"dt": "CPU (min)", "dd": "vCPU-minutes = cores × time", "ex": "2 cores × 30 min = 60"},
+        {"dt": "RAM (GB·min)", "dd": "Memory × time", "ex": "4 GB × 60 min = 240"},
+        {"dt": "Disk (GB·min)", "dd": "Disk × usage time", "ex": "10 GB × 1440 min"}
+      ]
+    },
+    "averages": {
+      "title": "Averages",
+      "items": [
+        {"dt": "Avg vCPU", "dd": "Average cores used", "ex": "0.5 = half a core"},
+        {"dt": "Avg RAM", "dd": "Average memory in GB", "ex": "0.25 = 256 MB"},
+        {"dt": "Avg Disk", "dd": "Average disk size in GB"}
+      ]
+    },
+    "network": {
+      "title": "Network",
+      "items": [
+        {"dt": "TX (GB)", "dd": "Outbound traffic — paid"},
+        {"dt": "RX (GB)", "dd": "Inbound traffic — free"}
+      ]
+    }
+  },
+  "uk": {
+    "legendTitle": "Що означають метрики?",
+    "cost": {
+      "title": "Вартість",
+      "items": [
+        {"dt": "Cost", "dd": "Поточні витрати за білінг-період (USD)"},
+        {"dt": "Forecast", "dd": "Прогноз на місяць"}
+      ]
+    },
+    "resources": {
+      "title": "Ресурси",
+      "items": [
+        {"dt": "CPU (min)", "dd": "vCPU-хвилини = ядра × час", "ex": "2 ядра × 30 хв = 60"},
+        {"dt": "RAM (GB·min)", "dd": "Пам'ять × час", "ex": "4 GB × 60 хв = 240"},
+        {"dt": "Disk (GB·min)", "dd": "Диск × час використання", "ex": "10 GB × 1440 хв"}
+      ]
+    },
+    "averages": {
+      "title": "Середні",
+      "items": [
+        {"dt": "Avg vCPU", "dd": "Середня кількість ядер", "ex": "0.5 = пів-ядра"},
+        {"dt": "Avg RAM", "dd": "Середня пам'ять в GB", "ex": "0.25 = 256 MB"},
+        {"dt": "Avg Disk", "dd": "Середній розмір диска в GB"}
+      ]
+    },
+    "network": {
+      "title": "Мережа",
+      "items": [
+        {"dt": "TX (GB)", "dd": "Вихідний трафік — платний"},
+        {"dt": "RX (GB)", "dd": "Вхідний трафік — безкоштовний"}
+      ]
+    }
+  },
+  "zh": {
+    "legendTitle": "指标含义?",
+    "cost": {
+      "title": "费用",
+      "items": [
+        {"dt": "Cost", "dd": "当前计费周期费用（美元）"},
+        {"dt": "Forecast", "dd": "预计月度费用"}
+      ]
+    },
+    "resources": {
+      "title": "资源",
+      "items": [
+        {"dt": "CPU (min)", "dd": "vCPU分钟 = 核心 × 时间", "ex": "2核心 × 30分钟 = 60"},
+        {"dt": "RAM (GB·min)", "dd": "内存 × 时间", "ex": "4 GB × 60分钟 = 240"},
+        {"dt": "Disk (GB·min)", "dd": "磁盘 × 使用时间", "ex": "10 GB × 1440分钟"}
+      ]
+    },
+    "averages": {
+      "title": "平均值",
+      "items": [
+        {"dt": "Avg vCPU", "dd": "平均使用核心数", "ex": "0.5 = 半个核心"},
+        {"dt": "Avg RAM", "dd": "平均内存（GB）", "ex": "0.25 = 256 MB"},
+        {"dt": "Avg Disk", "dd": "平均磁盘大小（GB）"}
+      ]
+    },
+    "network": {
+      "title": "网络",
+      "items": [
+        {"dt": "TX (GB)", "dd": "出站流量 — 付费"},
+        {"dt": "RX (GB)", "dd": "入站流量 — 免费"}
+      ]
+    }
+  },
+  "he": {
+    "legendTitle": "מה המשמעות של המדדים?",
+    "cost": {
+      "title": "עלות",
+      "items": [
+        {"dt": "Cost", "dd": "עלות תקופת החיוב הנוכחית (USD)"},
+        {"dt": "Forecast", "dd": "עלות חודשית צפויה"}
+      ]
+    },
+    "resources": {
+      "title": "משאבים",
+      "items": [
+        {"dt": "CPU (min)", "dd": "דקות vCPU = ליבות × זמן", "ex": "2 ליבות × 30 דקות = 60"},
+        {"dt": "RAM (GB·min)", "dd": "זיכרון × זמן", "ex": "4 GB × 60 דקות = 240"},
+        {"dt": "Disk (GB·min)", "dd": "דיסק × זמן שימוש", "ex": "10 GB × 1440 דקות"}
+      ]
+    },
+    "averages": {
+      "title": "ממוצעים",
+      "items": [
+        {"dt": "Avg vCPU", "dd": "ליבות ממוצעות בשימוש", "ex": "0.5 = חצי ליבה"},
+        {"dt": "Avg RAM", "dd": "זיכרון ממוצע ב-GB", "ex": "0.25 = 256 MB"},
+        {"dt": "Avg Disk", "dd": "גודל דיסק ממוצע ב-GB"}
+      ]
+    },
+    "network": {
+      "title": "רשת",
+      "items": [
+        {"dt": "TX (GB)", "dd": "תעבורה יוצאת — בתשלום"},
+        {"dt": "RX (GB)", "dd": "תעבורה נכנסת — חינם"}
+      ]
+    }
+  },
+  "de": {
+    "legendTitle": "Was bedeuten die Metriken?",
+    "cost": {
+      "title": "Kosten",
+      "items": [
+        {"dt": "Cost", "dd": "Aktuelle Abrechnungsperiode (USD)"},
+        {"dt": "Forecast", "dd": "Monatliche Prognose"}
+      ]
+    },
+    "resources": {
+      "title": "Ressourcen",
+      "items": [
+        {"dt": "CPU (min)", "dd": "vCPU-Minuten = Kerne × Zeit", "ex": "2 Kerne × 30 Min = 60"},
+        {"dt": "RAM (GB·min)", "dd": "Speicher × Zeit", "ex": "4 GB × 60 Min = 240"},
+        {"dt": "Disk (GB·min)", "dd": "Festplatte × Nutzungszeit", "ex": "10 GB × 1440 Min"}
+      ]
+    },
+    "averages": {
+      "title": "Durchschnitt",
+      "items": [
+        {"dt": "Avg vCPU", "dd": "Durchschnittliche Kerne", "ex": "0.5 = halber Kern"},
+        {"dt": "Avg RAM", "dd": "Durchschnittlicher Speicher in GB", "ex": "0.25 = 256 MB"},
+        {"dt": "Avg Disk", "dd": "Durchschnittliche Festplattengröße in GB"}
+      ]
+    },
+    "network": {
+      "title": "Netzwerk",
+      "items": [
+        {"dt": "TX (GB)", "dd": "Ausgehender Traffic — kostenpflichtig"},
+        {"dt": "RX (GB)", "dd": "Eingehender Traffic — kostenlos"}
+      ]
+    }
+  },
+  "fr": {
+    "legendTitle": "Que signifient les métriques?",
+    "cost": {
+      "title": "Coût",
+      "items": [
+        {"dt": "Cost", "dd": "Coût de la période de facturation (USD)"},
+        {"dt": "Forecast", "dd": "Prévision mensuelle"}
+      ]
+    },
+    "resources": {
+      "title": "Ressources",
+      "items": [
+        {"dt": "CPU (min)", "dd": "vCPU-minutes = cœurs × temps", "ex": "2 cœurs × 30 min = 60"},
+        {"dt": "RAM (GB·min)", "dd": "Mémoire × temps", "ex": "4 GB × 60 min = 240"},
+        {"dt": "Disk (GB·min)", "dd": "Disque × temps d'utilisation", "ex": "10 GB × 1440 min"}
+      ]
+    },
+    "averages": {
+      "title": "Moyennes",
+      "items": [
+        {"dt": "Avg vCPU", "dd": "Cœurs moyens utilisés", "ex": "0.5 = demi-cœur"},
+        {"dt": "Avg RAM", "dd": "Mémoire moyenne en GB", "ex": "0.25 = 256 MB"},
+        {"dt": "Avg Disk", "dd": "Taille moyenne du disque en GB"}
+      ]
+    },
+    "network": {
+      "title": "Réseau",
+      "items": [
+        {"dt": "TX (GB)", "dd": "Trafic sortant — payant"},
+        {"dt": "RX (GB)", "dd": "Trafic entrant — gratuit"}
+      ]
+    }
+  },
+  "es": {
+    "legendTitle": "¿Qué significan las métricas?",
+    "cost": {
+      "title": "Costo",
+      "items": [
+        {"dt": "Cost", "dd": "Costo del período de facturación (USD)"},
+        {"dt": "Forecast", "dd": "Pronóstico mensual"}
+      ]
+    },
+    "resources": {
+      "title": "Recursos",
+      "items": [
+        {"dt": "CPU (min)", "dd": "vCPU-minutos = núcleos × tiempo", "ex": "2 núcleos × 30 min = 60"},
+        {"dt": "RAM (GB·min)", "dd": "Memoria × tiempo", "ex": "4 GB × 60 min = 240"},
+        {"dt": "Disk (GB·min)", "dd": "Disco × tiempo de uso", "ex": "10 GB × 1440 min"}
+      ]
+    },
+    "averages": {
+      "title": "Promedios",
+      "items": [
+        {"dt": "Avg vCPU", "dd": "Núcleos promedio usados", "ex": "0.5 = medio núcleo"},
+        {"dt": "Avg RAM", "dd": "Memoria promedio en GB", "ex": "0.25 = 256 MB"},
+        {"dt": "Avg Disk", "dd": "Tamaño promedio del disco en GB"}
+      ]
+    },
+    "network": {
+      "title": "Red",
+      "items": [
+        {"dt": "TX (GB)", "dd": "Tráfico saliente — de pago"},
+        {"dt": "RX (GB)", "dd": "Tráfico entrante — gratis"}
+      ]
+    }
+  },
+  "kk": {
+    "legendTitle": "Метрикалар нені білдіреді?",
+    "cost": {
+      "title": "Құны",
+      "items": [
+        {"dt": "Cost", "dd": "Ағымдағы биллинг кезеңінің шығыны (USD)"},
+        {"dt": "Forecast", "dd": "Айлық болжам"}
+      ]
+    },
+    "resources": {
+      "title": "Ресурстар",
+      "items": [
+        {"dt": "CPU (min)", "dd": "vCPU-минуттар = ядролар × уақыт", "ex": "2 ядро × 30 мин = 60"},
+        {"dt": "RAM (GB·min)", "dd": "Жады × уақыт", "ex": "4 GB × 60 мин = 240"},
+        {"dt": "Disk (GB·min)", "dd": "Диск × пайдалану уақыты", "ex": "10 GB × 1440 мин"}
+      ]
+    },
+    "averages": {
+      "title": "Орташа",
+      "items": [
+        {"dt": "Avg vCPU", "dd": "Орташа ядро саны", "ex": "0.5 = жарты ядро"},
+        {"dt": "Avg RAM", "dd": "Орташа жады GB", "ex": "0.25 = 256 MB"},
+        {"dt": "Avg Disk", "dd": "Орташа диск өлшемі GB"}
+      ]
+    },
+    "network": {
+      "title": "Желі",
+      "items": [
+        {"dt": "TX (GB)", "dd": "Шығыс трафик — ақылы"},
+        {"dt": "RX (GB)", "dd": "Кіріс трафик — тегін"}
+      ]
+    }
+  }
+}

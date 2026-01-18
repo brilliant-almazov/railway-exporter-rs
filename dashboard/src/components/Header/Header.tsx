@@ -1,0 +1,106 @@
+'use client'
+
+import { CustomSelect } from '../Filters/CustomSelect'
+import { LogoIcon, RefreshIcon, ExternalLinkIcon, BoltIcon, ClockIcon } from '../common/Icons'
+import { formatInterval } from '@/lib/formatters'
+import { LANGUAGES, LANGUAGE_FLAGS, type Language } from '@/i18n/keys'
+import type { ApiStatusResponse } from '@/types'
+
+interface HeaderProps {
+  serverStatus: ApiStatusResponse | null
+  language: Language
+  onLanguageChange: (lang: Language) => void
+  useWebSocket: boolean
+  onWebSocketToggle: () => void
+  onRefresh: () => void
+  onShowRaw: () => void
+  translations: {
+    refresh: string
+    showRaw: string
+    wsRealtime: string
+    pollInterval: string
+  }
+}
+
+export function Header({
+  serverStatus,
+  language,
+  onLanguageChange,
+  useWebSocket,
+  onWebSocketToggle,
+  onRefresh,
+  onShowRaw,
+  translations: t
+}: HeaderProps) {
+  return (
+    <header>
+      <div className="header-inner">
+        <div className="header-main">
+          <div className="header-left">
+            <h1>
+              <LogoIcon className="logo-icon" />
+              SpendPulse
+            </h1>
+            {serverStatus && (
+              <>
+                <span className="project-name">{serverStatus.project_name}</span>
+                <span className={`plan-badge ${serverStatus.config.plan.toLowerCase()}`}>
+                  {serverStatus.config.plan}
+                </span>
+              </>
+            )}
+          </div>
+          <div className="header-right">
+            <button
+              className="icon-btn refresh-btn"
+              onClick={onRefresh}
+              disabled={useWebSocket}
+              title={t.refresh}
+            >
+              <RefreshIcon />
+            </button>
+            <button
+              className="icon-btn"
+              onClick={onShowRaw}
+              title={t.showRaw}
+            >
+              <ExternalLinkIcon />
+            </button>
+            {serverStatus?.endpoints.websocket && (
+              <button
+                className={`toggle-btn ${useWebSocket ? 'active' : ''}`}
+                onClick={onWebSocketToggle}
+                title={
+                  useWebSocket
+                    ? t.wsRealtime
+                    : t.pollInterval.replace(
+                        '{interval}',
+                        formatInterval(serverStatus?.config.scrape_interval_seconds || 5)
+                      )
+                }
+              >
+                {useWebSocket ? <BoltIcon /> : <ClockIcon />}
+              </button>
+            )}
+            <div className="lang-select">
+              <CustomSelect
+                value={language}
+                onChange={(val) => {
+                  if (val) {
+                    onLanguageChange(val as Language)
+                  }
+                }}
+                options={LANGUAGES.map(lang => ({
+                  value: lang,
+                  label: `${LANGUAGE_FLAGS[lang]} ${lang.toUpperCase()}`
+                }))}
+                placeholder="🌐"
+                allowDeselect={false}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+  )
+}
