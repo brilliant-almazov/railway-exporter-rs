@@ -322,11 +322,12 @@ header h1 {
 
 /* Main content */
 main {
-  flex: 1;
+  flex: 1 1 auto;
   padding: 16px 24px;
   display: flex;
   flex-direction: column;
-  overflow: hidden;  /* Main doesn't scroll */
+  overflow-x: hidden;
+  overflow-y: auto;
   min-height: 0;  /* Important for flex children to shrink */
 }
 
@@ -598,17 +599,18 @@ h3 {
   transform: translateX(0);
 }
 
-/* Services Section - scrollable */
+/* Services Section - fits content exactly */
 .services-section {
   background: white;
   border-radius: 8px;
   padding: 16px 20px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.08);
   border: 1px solid #e8eaed;
-  flex: 1;
+  flex: 0 1 auto;  /* Don't grow, can shrink */
   display: flex;
   flex-direction: column;
-  min-height: 0;  /* Allow shrinking */
+  min-height: 0;
+  max-height: 100%;
   overflow: hidden;
 }
 
@@ -853,12 +855,14 @@ h3 {
 }
 
 
-/* Table container - no scroll here */
+/* Table container - scrollable, shrink to fit */
 .table-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
+  flex: 1 1 auto;
   min-height: 0;  /* Allow shrinking */
+  max-height: 100%;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0,0,0,0.15) transparent;
 }
 
 .table-container::-webkit-scrollbar {
@@ -878,27 +882,25 @@ h3 {
   background: rgba(0,0,0,0.25);
 }
 
-/* Table - flex layout for scroll control */
+/* Table - auto layout with stable font rendering */
 table {
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-height: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 thead {
   background: #f8f9fa;
-  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 tbody {
-  flex: 1;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(0,0,0,0.15) transparent;
+  /* Normal flow */
 }
 
 tbody::-webkit-scrollbar {
@@ -918,11 +920,7 @@ tbody::-webkit-scrollbar-thumb:hover {
   background: rgba(0,0,0,0.25);
 }
 
-thead, tbody, tfoot {
-  display: table;
-  width: 100%;
-  table-layout: fixed;
-}
+/* Columns auto-size based on content */
 
 th {
   padding: 10px 8px;
@@ -977,6 +975,9 @@ td.right {
 td.money { color: #34a853; }
 td.highlight { background: #f0f7ff; font-weight: 500; color: #1a73e8; }
 
+tbody tr {
+  transition: background 0.15s ease-out, opacity 0.2s ease-out;
+}
 tbody tr:hover { background: #f8f9fa; }
 
 /* No results row */
@@ -1024,10 +1025,16 @@ tbody tr:hover { background: #f8f9fa; }
 tr.deleted-row {
   opacity: 0.6;
   background: #fff3e0;
+  animation: row-appear 0.2s ease-out;
 }
 
 tr.deleted-row:hover {
   background: #ffe0b2;
+}
+
+@keyframes row-appear {
+  from { opacity: 0; }
+  to { opacity: 0.6; }
 }
 
 .deleted-badge {
@@ -1062,10 +1069,13 @@ tr.deleted-row:hover {
   color: #ea4335;
 }
 
-/* Totals Row - fixed at bottom */
+/* Totals Row - sticky at bottom */
 tfoot {
   flex-shrink: 0;
   background: #f8f9fa;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
 }
 
 .totals-row {
@@ -1088,11 +1098,13 @@ tfoot td {
   display: flex;
   align-items: center;
   gap: 10px;
+  min-width: 0;  /* Allow flex item to shrink */
 }
 
 .service-icon {
   width: 24px;
   height: 24px;
+  flex-shrink: 0;
   object-fit: contain;
   border-radius: 4px;
 }
@@ -1100,11 +1112,20 @@ tfoot td {
 .icon-emoji {
   font-size: 20px;
   width: 24px;
+  flex-shrink: 0;
   text-align: center;
 }
 
 .service-cell .name {
   font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Deleted services - truncate long UUIDs */
+.deleted .service-cell .name {
+  max-width: 180px;
 }
 
 .group-badge {
@@ -1149,6 +1170,18 @@ tfoot td {
   padding: 32px;
   color: #5f6368;
   font-size: 16px;
+  animation: fade-in 0.3s ease-out;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Footer - always at bottom (sticky footer pattern) */
