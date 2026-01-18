@@ -2,6 +2,7 @@ import {useEffect, useState, useCallback, useMemo, useRef} from 'react'
 import './App.css'
 import uiTranslations from './i18n/ui.json'
 import {LANGUAGES, LANGUAGE_FLAGS, type Language} from './i18n/keys'
+import {colors} from './colors'
 
 interface ServiceMetrics {
   name: string
@@ -626,14 +627,15 @@ const translations = {
   }
 }
 
-function StatCard({title, value, subtitle, color = '#1a73e8'}: {
+function StatCard({title, value, subtitle, color = '#1a73e8', updated = false}: {
   title: string;
   value: string;
   subtitle?: string;
-  color?: string
+  color?: string;
+  updated?: boolean;
 }) {
   return (
-    <div className="stat-card">
+    <div className={`stat-card ${updated ? 'updated' : ''}`}>
       <div className="stat-title">{title}</div>
       <div className="stat-value" style={{color}}>{value}</div>
       {subtitle && <div className="stat-subtitle">{subtitle}</div>}
@@ -647,6 +649,7 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null)
+  const [justUpdated, setJustUpdated] = useState(false)
   const apiHost = import.meta.env.VITE_API_HOST || 'localhost:9090'
   const [metricsUrl] = useState(`http://${apiHost}/metrics`)
   const [, setWsConnected] = useState(false)
@@ -691,6 +694,7 @@ function App() {
     }, 1000)
     return () => clearInterval(timer)
   }, [])
+
 
   // Get groups from server status (config) instead of extracting from services
   const groups = useMemo(() => {
@@ -787,6 +791,9 @@ function App() {
       setUptime(status.uptime_seconds)
       setError(null)
       setLastUpdate(new Date())
+      // Trigger update animation
+      setJustUpdated(true)
+      setTimeout(() => setJustUpdated(false), 700)
     } catch (err) {
       setError(`Failed to fetch metrics: ${err}`)
     } finally {
@@ -827,6 +834,9 @@ function App() {
             setMetrics(mapApiToMetrics(msg.data))
             setLastUpdate(new Date())
             setLoading(false)
+            // Trigger update animation
+            setJustUpdated(true)
+            setTimeout(() => setJustUpdated(false), 700)
           } else if (msg.type === 'status') {
             // Update uptime and API status from WebSocket
             setUptime(msg.data.uptime_seconds)
@@ -968,24 +978,28 @@ function App() {
                 title={t.currentSpend}
                 value={formatCurrency(metrics.currentUsage)}
                 subtitle={`Day ${metrics.daysInPeriod} / ${metrics.daysInPeriod + metrics.daysRemaining}`}
-                color="#34a853"
+                color={colors.success}
+                updated={justUpdated}
               />
               <StatCard
                 title={t.estimatedMonthly}
                 value={formatCurrency(metrics.estimatedMonthly)}
                 subtitle={t.projectedTotal}
-                color="#fbbc04"
+                color={colors.warning}
+                updated={justUpdated}
               />
               <StatCard
                 title={t.dailyAverage}
                 value={formatCurrency(metrics.dailyAverage)}
                 subtitle={t.perDayCost}
+                updated={justUpdated}
               />
               <StatCard
                 title={t.minutesElapsed}
                 value={(metrics.daysInPeriod * 24 * 60).toLocaleString()}
                 subtitle={`${metrics.services.length} ${t.services.toLowerCase()}`}
-                color="#4285f4"
+                color={colors.primary}
+                updated={justUpdated}
               />
             </div>
             <div className="stats-grid stats-grid-secondary">
@@ -993,25 +1007,29 @@ function App() {
                 title="CPU (min)"
                 value={formatNumber(filteredTotals.cpuMinutes, 0)}
                 subtitle={`Avg: ${formatNumber(filteredTotals.avgCpu, 2)} vCPU`}
-                color="#5f6368"
+                color={colors.cpu}
+                updated={justUpdated}
               />
               <StatCard
                 title="RAM (GB·min)"
                 value={formatNumber(filteredTotals.memoryGbMinutes, 0)}
                 subtitle={`Avg: ${formatNumber(filteredTotals.avgMemory, 2)} GB`}
-                color="#5f6368"
+                color={colors.ram}
+                updated={justUpdated}
               />
               <StatCard
                 title="Disk (GB·min)"
                 value={formatNumber(filteredTotals.diskGbMinutes, 0)}
                 subtitle={`Avg: ${formatNumber(filteredTotals.avgDisk, 2)} GB`}
-                color="#5f6368"
+                color={colors.disk}
+                updated={justUpdated}
               />
               <StatCard
                 title="Network (GB)"
                 value={`↑${formatNumber(filteredTotals.networkTxGb, 2)} ↓${formatNumber(filteredTotals.networkRxGb, 2)}`}
                 subtitle="TX / RX"
-                color="#5f6368"
+                color={colors.network}
+                updated={justUpdated}
               />
             </div>
           </section>
@@ -1079,7 +1097,7 @@ function App() {
                 <div className="filters-row">
                   {deletedStats.count > 0 && (
                     <div className="deleted-block">
-                      🗑️ {deletedStats.count} • <span className="cost">{formatCurrency(deletedStats.cost)}</span>
+                      {deletedStats.count} deleted • <span className="cost">{formatCurrency(deletedStats.cost)}</span>
                     </div>
                   )}
                   <div className="filters">
@@ -1110,7 +1128,7 @@ function App() {
                         checked={showDeleted}
                         onChange={(e) => setShowDeleted(e.target.checked)}
                       />
-                      🗑️ {t.showDeleted}
+                      {t.showDeleted}
                     </label>
                   </div>
                 </div>
