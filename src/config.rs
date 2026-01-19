@@ -228,6 +228,10 @@ pub struct IconCacheConfig {
     /// Default: 86400 (1 day).
     #[serde(default = "default_icon_cache_max_age")]
     pub max_age: u32,
+    /// Base URL for icon links (for mode: link).
+    /// Example: "http://localhost:9090" or "https://exporter.railway.app"
+    #[serde(default)]
+    pub base_url: String,
 }
 
 fn default_icon_cache_enabled() -> bool {
@@ -247,6 +251,7 @@ impl Default for IconCacheConfig {
             max_count: default_icon_cache_max_count(),
             mode: IconMode::default(),
             max_age: default_icon_cache_max_age(),
+            base_url: String::new(),
         }
     }
 }

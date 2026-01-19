@@ -1,8 +1,9 @@
 //! Status endpoint handler.
 
 use super::HandlerResponse;
+use crate::config::IconMode;
 use crate::state::AppState;
-use crate::types::{ApiStatus, ConfigStatus, EndpointStatus, ServerStatus};
+use crate::types::{ApiStatus, ConfigStatus, EndpointStatus, IconCacheStatusConfig, ServerStatus};
 use hyper::body::Bytes;
 use hyper::Response;
 
@@ -14,6 +15,7 @@ use hyper::Response;
 /// - config (plan, scrape_interval, groups list)
 /// - process (CPU, memory from ProcessInfoProvider in AppState)
 /// - api (last success/error, scrape counts)
+/// - icon_cache statistics (only in base64 mode)
 pub async fn handle(state: &AppState) -> HandlerResponse {
     let api_status = state.api_status.read().await;
     let process = state.process_info.status();
@@ -29,8 +31,27 @@ pub async fn handle(state: &AppState) -> HandlerResponse {
     // Get group names from config
     let service_groups: Vec<String> = state.config.service_groups.keys().cloned().collect();
 
-    // Get icon cache statistics
-    let icon_cache = state.icon_cache.stats().await;
+    // Get icon cache statistics (both modes store icons on server)
+    let icon_cache = Some(state.icon_cache.stats().await);
+
+    // Build icon_cache config based on mode
+    let ic = &state.config.icon_cache;
+    let icon_cache_config = match ic.mode {
+        IconMode::Base64 => IconCacheStatusConfig {
+            enabled: ic.enabled,
+            mode: ic.mode,
+            max_count: Some(ic.max_count),
+            max_age: None,
+            base_url: None,
+        },
+        IconMode::Link => IconCacheStatusConfig {
+            enabled: ic.enabled,
+            mode: ic.mode,
+            max_count: Some(ic.max_count),  // Always show for "Icons: X/Y"
+            max_age: Some(ic.max_age),
+            base_url: if ic.base_url.is_empty() { None } else { Some(ic.base_url.clone()) },
+        },
+    };
 
     let status = ServerStatus {
         version: env!("CARGO_PKG_VERSION"),
@@ -44,7 +65,7 @@ pub async fn handle(state: &AppState) -> HandlerResponse {
             service_groups,
             prices: state.config.pricing_values.clone(),
             gzip: state.config.gzip.clone(),
-            icon_cache: state.config.icon_cache.clone(),
+            icon_cache: icon_cache_config,
         },
         process,
         api: ApiStatus {

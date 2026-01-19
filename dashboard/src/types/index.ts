@@ -129,7 +129,10 @@ export interface ApiStatusResponse {
     }
     icon_cache: {
       enabled: boolean
-      max_count: number
+      mode: 'base64' | 'link'
+      max_count?: number  // Present in both modes
+      max_age?: number    // Only in link mode
+      base_url?: string   // Only in link mode
     }
   }
   process: {
@@ -143,5 +146,6 @@ export interface ApiStatusResponse {
     total_scrapes: number
     failed_scrapes: number
   }
-  icon_cache: IconCacheStats
+  // Icon cache statistics (present when cache is enabled)
+  icon_cache?: IconCacheStats
 }

@@ -34,8 +34,9 @@
 }
 
 html, body {
-  min-height: 100vh;
+  height: 100vh;
   width: 100%;
+  overflow: hidden;  /* Prevent body scroll */
 }
 
 body {
@@ -49,12 +50,12 @@ body {
 }
 
 .app {
-  min-height: 100vh;  /* At least full viewport, can grow */
+  height: 100vh;  /* Fixed height, not min-height */
   display: flex;
   flex-direction: column;
   width: 100%;
   max-width: 1400px;
-  /* No overflow: hidden - allow body scroll */
+  overflow: hidden;
 }
 
 /* Smooth language change transitions */
@@ -285,14 +286,14 @@ header h1 {
   background: #3c4043 !important;
 }
 
-/* Main content - flex container, sizes based on content but can grow */
+/* Main content */
 main {
-  flex: 1 1 auto;  /* Grow to fill, shrink as needed, basis auto (content) */
+  flex: 1;
   padding: 16px 24px;
   display: flex;
   flex-direction: column;
-  /* No overflow: hidden - content flows naturally, body scrolls */
   min-height: 0;
+  overflow: hidden;  /* Contains overflow, passes to children */
   transition: padding 0.3s ease;
 }
 
@@ -517,7 +518,7 @@ h3 {
 /* Services Wrapper - contains section + side Clear button */
 .services-wrapper {
   position: relative;
-  flex: 0 0 auto;  /* Size to content */
+  flex: 1;  /* Take remaining space */
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -570,18 +571,18 @@ h3 {
   transform: translateX(0);
 }
 
-/* Services Section - sizes based on content, scroll inside table-container */
+/* Services Section */
 .services-section {
   background: white;
   border-radius: 8px;
   padding: 16px 20px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.08);
   border: 1px solid #e8eaed;
-  flex: 0 0 auto;  /* Size to content */
+  flex: 1;  /* Take remaining space */
   display: flex;
   flex-direction: column;
   min-height: 100px;
-  /* No overflow: hidden - content flows naturally */
+  overflow: hidden;  /* Contains overflow */
   transition: padding 0.3s ease;
 }
 
@@ -826,11 +827,12 @@ h3 {
 }
 
 
-/* Table container - the ONLY scrollable area for data */
+/* Table container */
 .table-container {
-  flex: 0 0 auto;  /* Size to content, no grow/shrink */
+  flex: 1;  /* Take remaining space in services-section */
   min-height: 0;
-  overflow: visible;  /* No scroll here - body scrolls */
+  overflow-y: auto;  /* Enable vertical scroll */
+  overflow-x: hidden;
 }
 
 .table-container::-webkit-scrollbar {
@@ -912,6 +914,20 @@ th {
   white-space: nowrap;
   font-size: 13px;
 }
+
+/* Fixed column widths to prevent jumping on language change */
+/* Values based on longest translation across all languages */
+th:nth-child(1) { min-width: 90px; }   /* Service - "Servicio", "Сервис" */
+th:nth-child(2) { min-width: 75px; }   /* Group - "Группа", "Groupe" */
+th:nth-child(3) { min-width: 100px; }  /* Cost - "Стоимость" longest */
+th:nth-child(4) { min-width: 95px; }   /* Forecast - "Pronóstico", "Prévision" */
+th:nth-child(5) { min-width: 105px; }  /* CPU (min) - "CPU (分钟)" zh longest */
+th:nth-child(6) { min-width: 100px; }  /* Avg vCPU - "平均vCPU" zh */
+th:nth-child(7) { min-width: 130px; }  /* RAM (GB·min) - "内存 (GB·分钟)" zh */
+th:nth-child(8) { min-width: 100px; }  /* Avg RAM - "平均内存" zh */
+th:nth-child(9) { min-width: 135px; }  /* Disk (GB·min) - "磁盘 (GB·分钟)" zh */
+th:nth-child(10) { min-width: 105px; } /* Avg Disk - "平均磁盘", "Moy. disque" */
+th:nth-child(11) { min-width: 85px; }  /* TX (GB) - "发送 (GB)" zh */
 
 th.right { text-align: right; }
 

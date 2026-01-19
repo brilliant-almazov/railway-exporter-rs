@@ -81,7 +81,9 @@ pub struct ServerStatus {
     pub config: ConfigStatus,
     pub process: ProcessStatus,
     pub api: ApiStatus,
-    pub icon_cache: crate::utils::IconCacheStats,
+    /// Icon cache statistics (only present in base64 mode).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub icon_cache: Option<crate::utils::IconCacheStats>,
 }
 
 /// Endpoint availability status (from config).
@@ -104,8 +106,24 @@ pub struct ConfigStatus {
     pub prices: PriceValues,
     /// Gzip compression configuration from YAML.
     pub gzip: crate::config::GzipConfig,
-    /// Icon cache configuration from YAML.
-    pub icon_cache: crate::config::IconCacheConfig,
+    /// Icon cache configuration (fields depend on mode).
+    pub icon_cache: IconCacheStatusConfig,
+}
+
+/// Icon cache config for API response (mode-dependent fields).
+#[derive(Serialize, Debug)]
+pub struct IconCacheStatusConfig {
+    pub enabled: bool,
+    pub mode: crate::config::IconMode,
+    /// Max icons to cache (only in base64 mode).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub max_count: Option<usize>,
+    /// Browser cache TTL in seconds (only in link mode).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub max_age: Option<u32>,
+    /// Base URL for icon links (only in link mode).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub base_url: Option<String>,
 }
 
 #[derive(Serialize, Debug)]

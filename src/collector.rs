@@ -85,10 +85,15 @@ pub async fn collect_metrics(
                     state.icon_cache.get_icon(&name, &icon_url).await
                 }
                 IconMode::Link => {
-                    // Ensure icon is cached, return URL to our endpoint
+                    // Ensure icon is cached, return full URL to our endpoint
                     if !icon_url.is_empty() && !icon_url.starts_with("data:") {
                         state.icon_cache.ensure_cached(&name, &icon_url).await;
-                        format!("/static/icons/services/{}", urlencoding::encode(&name))
+                        let path = format!("/static/icons/services/{}", urlencoding::encode(&name));
+                        if config.icon_cache.base_url.is_empty() {
+                            path
+                        } else {
+                            format!("{}{}", config.icon_cache.base_url, path)
+                        }
                     } else if icon_url.starts_with("data:") {
                         // Already a data URL - use as-is
                         icon_url.clone()
