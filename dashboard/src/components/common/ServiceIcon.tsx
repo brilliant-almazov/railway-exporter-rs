@@ -1,17 +1,21 @@
-// Service icon with multiple fallback strategies:
-// 1. Base64 data URL from server (fastest - already inline)
-// 2. Bundled SVG for known services (no network)
-// 3. Generic icon fallback
-
-import { getServiceIcon, hasServiceIcon } from '@/lib/serviceIcons'
+// Service icon: displays URL from server or generic fallback
 
 interface ServiceIconProps {
   url: string
   name: string
 }
 
+// Generic fallback icon (simple box with plus)
+function GenericIcon() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3" y="3" width="18" height="18" rx="3" fill="#e8eaed" stroke="#dadce0" strokeWidth="1"/>
+      <path d="M8 12h8M12 8v8" stroke="#5f6368" strokeWidth="2" strokeLinecap="round"/>
+    </svg>
+  )
+}
+
 export function ServiceIcon({ url, name }: ServiceIconProps) {
-  // Fixed container to prevent layout shift
   const containerStyle = {
     display: 'inline-flex',
     width: 24,
@@ -21,34 +25,7 @@ export function ServiceIcon({ url, name }: ServiceIconProps) {
     justifyContent: 'center',
   } as const
 
-  // Strategy 1: Server sent Base64 data URL - use directly (fastest)
-  if (url && url.startsWith('data:')) {
-    return (
-      <span className="service-icon-wrapper" style={containerStyle}>
-        <img
-          src={url}
-          alt={name}
-          width={24}
-          height={24}
-          loading="eager"
-          decoding="sync"
-          style={{ display: 'block', width: 24, height: 24 }}
-        />
-      </span>
-    )
-  }
-
-  // Strategy 2: Use bundled SVG icon for known services
-  if (hasServiceIcon(name)) {
-    return (
-      <span className="service-icon-wrapper" style={containerStyle}>
-        {getServiceIcon(name)}
-      </span>
-    )
-  }
-
-  // Strategy 3: Server sent URL (but not data URL) - use as img src
-  // This is for backward compatibility during transition
+  // Server sent URL (base64 or regular) - use as img src
   if (url) {
     return (
       <span className="service-icon-wrapper" style={containerStyle}>
@@ -68,7 +45,7 @@ export function ServiceIcon({ url, name }: ServiceIconProps) {
   // Fallback: generic icon
   return (
     <span className="service-icon-wrapper" style={containerStyle}>
-      {getServiceIcon(name)}
+      <GenericIcon />
     </span>
   )
 }

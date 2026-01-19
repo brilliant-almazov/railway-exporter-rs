@@ -18,7 +18,6 @@ export function mapApiToMetrics(api: ApiMetricsJson): ParsedMetrics {
     memoryGbMinutes: svc.memory_usage,
     diskGbMinutes: svc.disk_usage,
     networkTxGb: svc.network_tx,
-    networkRxGb: svc.network_rx,
     avgCpu: minutesInPeriod > 0 ? svc.cpu_usage / minutesInPeriod : 0,
     avgMemory: minutesInPeriod > 0 ? svc.memory_usage / minutesInPeriod : 0,
     avgDisk: minutesInPeriod > 0 ? svc.disk_usage / minutesInPeriod : 0,

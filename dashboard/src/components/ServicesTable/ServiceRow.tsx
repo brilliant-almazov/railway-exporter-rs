@@ -48,9 +48,6 @@ function ServiceRowComponent({ service: svc }: ServiceRowProps) {
       <td className="right" title={`Raw: ${svc.networkTxGb}`}>
         {formatNumber(svc.networkTxGb, 4)}
       </td>
-      <td className="right" title={`Raw: ${svc.networkRxGb}`}>
-        {formatNumber(svc.networkRxGb, 4)}
-      </td>
     </tr>
   )
 }

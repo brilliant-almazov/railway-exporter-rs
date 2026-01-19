@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import { Header } from '../Header/Header'
 import { Footer } from '../Footer/Footer'
 import { Overview } from '../Overview/Overview'
@@ -9,6 +9,8 @@ import { ServicesTable } from '../ServicesTable/ServicesTable'
 import { useMetrics } from '@/hooks/useMetrics'
 import { useServerStatus } from '@/hooks/useServerStatus'
 import { useLanguage } from '@/hooks/useLanguage'
+import { useCompactMode } from '@/hooks/useCompactMode'
+import { type Language } from '@/i18n/keys'
 import uiTranslations from '@/i18n/ui.json'
 import type { FilteredTotals, ServiceMetrics } from '@/types'
 import type { InitialData } from '@/lib/api.server'
@@ -33,7 +35,6 @@ function calculateTotals(services: ServiceMetrics[]): FilteredTotals {
     diskGbMinutes: activeServices.reduce((a, s) => a + s.diskGbMinutes, 0),
     avgDisk: activeServices.reduce((a, s) => a + s.avgDisk, 0),
     networkTxGb: activeServices.reduce((a, s) => a + s.networkTxGb, 0),
-    networkRxGb: activeServices.reduce((a, s) => a + s.networkRxGb, 0),
   }
 }
 
@@ -47,12 +48,15 @@ const defaultTotals: FilteredTotals = {
   diskGbMinutes: 0,
   avgDisk: 0,
   networkTxGb: 0,
-  networkRxGb: 0,
 }
 
 export function Dashboard({ apiHost, initialData }: DashboardProps) {
   const { language, setLanguage } = useLanguage()
-  const [useWebSocket, setUseWebSocket] = useState(false)
+  const isCompact = useCompactMode(50)
+  // Default to WebSocket if backend has it enabled
+  const [useWebSocket, setUseWebSocket] = useState(
+    () => initialData.serverStatus?.endpoints.websocket ?? false
+  )
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null)
   const [justUpdated, setJustUpdated] = useState(false)
   // Initialize with SSR data to prevent layout shift
@@ -73,7 +77,7 @@ export function Dashboard({ apiHost, initialData }: DashboardProps) {
   })
 
   // Get translations for current language
-  const t = uiTranslations[language] || uiTranslations.en
+  const t = (uiTranslations as Record<Language, typeof uiTranslations.en>)[language] || uiTranslations.en
 
   // Get groups from server status
   const groups = useMemo(() => {
@@ -140,6 +144,7 @@ export function Dashboard({ apiHost, initialData }: DashboardProps) {
             metrics={metrics}
             filteredTotals={filteredTotals}
             updated={justUpdated}
+            isCompact={isCompact}
             translations={{
               currentSpend: t.currentSpend,
               estimatedMonthly: t.estimatedMonthly,
@@ -151,7 +156,7 @@ export function Dashboard({ apiHost, initialData }: DashboardProps) {
             }}
           />
 
-          <Legend language={language} />
+          <Legend language={language} isCompact={isCompact} />
 
           <ServicesTable
             services={metrics.services}
@@ -171,7 +176,6 @@ export function Dashboard({ apiHost, initialData }: DashboardProps) {
               diskGbMin: t.diskGbMin,
               avgDisk: t.avgDisk,
               txGb: t.txGb,
-              rxGb: t.rxGb,
               total: t.total,
               filterByService: t.filterByService,
               allGroups: t.allGroups,

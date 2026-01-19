@@ -23,6 +23,8 @@ export function useMetrics({
   const queryClient = useQueryClient()
   const wsRef = useRef<WebSocket | null>(null)
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  // Skip first WS update if we have SSR data (prevents hydration jump)
+  const skipFirstWsUpdate = useRef(!!initialData)
 
   const metricsUrl = `http://${apiHost}/metrics`
   const wsUrl = `ws://${apiHost}/ws`
@@ -43,6 +45,11 @@ export function useMetrics({
   // Handle WebSocket message
   const handleWsMessage = useCallback((data: WsMessage) => {
     if (data.type === 'metrics') {
+      // Skip first WS update if we have SSR data (prevents hydration jump)
+      if (skipFirstWsUpdate.current) {
+        skipFirstWsUpdate.current = false
+        return
+      }
       const metrics = mapApiToMetrics(data.data as ApiMetricsJson)
       queryClient.setQueryData<ParsedMetrics>(METRICS_KEY, metrics)
     }

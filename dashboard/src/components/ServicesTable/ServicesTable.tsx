@@ -1,10 +1,11 @@
 'use client'
 
-import { useMemo, useState, useCallback } from 'react'
+import { useMemo, useState, useCallback, useEffect } from 'react'
 import { CustomSelect } from '../Filters/CustomSelect'
 import { SortIndicator } from './SortIndicator'
 import { ServiceRow } from './ServiceRow'
 import { useUrlFilters } from '@/hooks/useUrlFilters'
+import { useDirection } from '@/hooks/useDirection'
 import { formatCurrency, formatNumber } from '@/lib/formatters'
 import type { ServiceMetrics, FilteredTotals } from '@/types'
 
@@ -25,7 +26,6 @@ interface ServicesTableProps {
     diskGbMin: string
     avgDisk: string
     txGb: string
-    rxGb: string
     total: string
     filterByService: string
     allGroups: string
@@ -42,6 +42,7 @@ export function ServicesTable({
   translations: t,
   onTotalsChange
 }: ServicesTableProps) {
+  const dir = useDirection()
   // URL-synced filters (snake_case params: ?search=x&group=y&show_deleted=true)
   const {
     search: filterService,
@@ -98,22 +99,22 @@ export function ServicesTable({
   }, [services, filterService, filterGroup, showDeleted, sortColumn, sortDirection])
 
   // Calculate totals for filtered services
-  const filteredTotals = useMemo(() => {
-    const totals: FilteredTotals = {
-      cost: filteredServices.reduce((a, s) => a + s.cost, 0),
-      estimatedMonthly: filteredServices.reduce((a, s) => a + s.estimatedMonthly, 0),
-      cpuMinutes: filteredServices.reduce((a, s) => a + s.cpuMinutes, 0),
-      avgCpu: filteredServices.reduce((a, s) => a + s.avgCpu, 0),
-      memoryGbMinutes: filteredServices.reduce((a, s) => a + s.memoryGbMinutes, 0),
-      avgMemory: filteredServices.reduce((a, s) => a + s.avgMemory, 0),
-      diskGbMinutes: filteredServices.reduce((a, s) => a + s.diskGbMinutes, 0),
-      avgDisk: filteredServices.reduce((a, s) => a + s.avgDisk, 0),
-      networkTxGb: filteredServices.reduce((a, s) => a + s.networkTxGb, 0),
-      networkRxGb: filteredServices.reduce((a, s) => a + s.networkRxGb, 0),
-    }
-    onTotalsChange?.(totals)
-    return totals
-  }, [filteredServices, onTotalsChange])
+  const filteredTotals = useMemo(() => ({
+    cost: filteredServices.reduce((a, s) => a + s.cost, 0),
+    estimatedMonthly: filteredServices.reduce((a, s) => a + s.estimatedMonthly, 0),
+    cpuMinutes: filteredServices.reduce((a, s) => a + s.cpuMinutes, 0),
+    avgCpu: filteredServices.reduce((a, s) => a + s.avgCpu, 0),
+    memoryGbMinutes: filteredServices.reduce((a, s) => a + s.memoryGbMinutes, 0),
+    avgMemory: filteredServices.reduce((a, s) => a + s.avgMemory, 0),
+    diskGbMinutes: filteredServices.reduce((a, s) => a + s.diskGbMinutes, 0),
+    avgDisk: filteredServices.reduce((a, s) => a + s.avgDisk, 0),
+    networkTxGb: filteredServices.reduce((a, s) => a + s.networkTxGb, 0),
+  }), [filteredServices])
+
+  // Notify parent of totals change (in effect to avoid setState during render)
+  useEffect(() => {
+    onTotalsChange?.(filteredTotals)
+  }, [filteredTotals, onTotalsChange])
 
   const activeCount = services.filter(s => !s.isDeleted).length
   const filteredActiveCount = filteredServices.filter(s => !s.isDeleted).length
@@ -124,7 +125,7 @@ export function ServicesTable({
     <div className="services-wrapper">
       <section
         className="services-section"
-        dir={language === 'he' ? 'rtl' : 'ltr'}
+        dir={dir}
       >
         <div className="services-header">
           <h3>
@@ -213,15 +214,12 @@ export function ServicesTable({
                 <th className="right sortable" onClick={() => handleSort('networkTxGb')}>
                   {t.txGb} <SortIndicator column="networkTxGb" sortColumn={sortColumn} sortDirection={sortDirection} />
                 </th>
-                <th className="right sortable" onClick={() => handleSort('networkRxGb')}>
-                  {t.rxGb} <SortIndicator column="networkRxGb" sortColumn={sortColumn} sortDirection={sortDirection} />
-                </th>
               </tr>
             </thead>
             <tbody>
               {filteredServices.length === 0 ? (
                 <tr>
-                  <td colSpan={12} className="no-results">
+                  <td colSpan={11} className="no-results">
                     🔍 {language === 'ru' ? 'Ничего не найдено' : language === 'uk' ? 'Нічого не знайдено' : 'No results found'}
                   </td>
                 </tr>
@@ -243,7 +241,6 @@ export function ServicesTable({
                 <td className="right"><strong>{formatNumber(filteredTotals.diskGbMinutes, 0)}</strong></td>
                 <td className="right highlight"><strong>{formatNumber(filteredTotals.avgDisk, 4)}</strong></td>
                 <td className="right"><strong>{formatNumber(filteredTotals.networkTxGb, 4)}</strong></td>
-                <td className="right"><strong>{formatNumber(filteredTotals.networkRxGb, 4)}</strong></td>
               </tr>
             </tfoot>
           </table>
