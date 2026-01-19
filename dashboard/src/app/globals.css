@@ -835,8 +835,18 @@ h3 {
   overflow-x: hidden;
 }
 
+/* Subtle scrollbar - thin, appears on hover */
+.table-container {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.table-container:hover {
+  scrollbar-color: rgba(0,0,0,0.2) transparent;
+}
+
 .table-container::-webkit-scrollbar {
-  width: 6px;
+  width: 4px;
 }
 
 .table-container::-webkit-scrollbar-track {
@@ -844,20 +854,25 @@ h3 {
 }
 
 .table-container::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 2px;
+  transition: background 0.2s ease;
+}
+
+.table-container:hover::-webkit-scrollbar-thumb {
   background: rgba(0,0,0,0.15);
-  border-radius: 3px;
 }
 
 .table-container::-webkit-scrollbar-thumb:hover {
   background: rgba(0,0,0,0.25);
 }
 
-/* Table - auto layout, columns size to content */
+/* Table - fixed layout for stable column widths */
 table {
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
-  table-layout: auto;
+  table-layout: fixed;  /* Fixed widths, no jumping on language change */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -915,19 +930,19 @@ th {
   font-size: 13px;
 }
 
-/* Fixed column widths to prevent jumping on language change */
-/* Values based on longest translation across all languages */
-th:nth-child(1) { min-width: 90px; }   /* Service - "Servicio", "Сервис" */
-th:nth-child(2) { min-width: 75px; }   /* Group - "Группа", "Groupe" */
-th:nth-child(3) { min-width: 100px; }  /* Cost - "Стоимость" longest */
-th:nth-child(4) { min-width: 95px; }   /* Forecast - "Pronóstico", "Prévision" */
-th:nth-child(5) { min-width: 105px; }  /* CPU (min) - "CPU (分钟)" zh longest */
-th:nth-child(6) { min-width: 100px; }  /* Avg vCPU - "平均vCPU" zh */
-th:nth-child(7) { min-width: 130px; }  /* RAM (GB·min) - "内存 (GB·分钟)" zh */
-th:nth-child(8) { min-width: 100px; }  /* Avg RAM - "平均内存" zh */
-th:nth-child(9) { min-width: 135px; }  /* Disk (GB·min) - "磁盘 (GB·分钟)" zh */
-th:nth-child(10) { min-width: 105px; } /* Avg Disk - "平均磁盘", "Moy. disque" */
-th:nth-child(11) { min-width: 85px; }  /* TX (GB) - "发送 (GB)" zh */
+/* Fixed column widths - calculated from max translation length across all languages */
+/* Formula: chars * 8px + 24px (padding + sort indicator) */
+th:nth-child(1) { width: auto; }       /* Service - dynamic from data */
+th:nth-child(2) { width: 72px; }       /* Group: "Группа" (ru) 6ch */
+th:nth-child(3) { width: 96px; }       /* Cost: "Стоимость" (ru) 9ch */
+th:nth-child(4) { width: 104px; }      /* Forecast: "Pronóstico" (es) 10ch */
+th:nth-child(5) { width: 104px; }      /* CPU (min): "CPU (分钟)" (zh) 10ch */
+th:nth-child(6) { width: 112px; }      /* Avg vCPU: "Gj.sn. vCPU" (no) 11ch */
+th:nth-child(7) { width: 136px; }      /* RAM (GB·min): "内存 (GB·分钟)" (zh) 14ch */
+th:nth-child(8) { width: 104px; }      /* Avg RAM: "Gj.sn. RAM" (no) 10ch */
+th:nth-child(9) { width: 144px; }      /* Disk (GB·min): "Disque (Go·min)" (fr) 15ch */
+th:nth-child(10) { width: 112px; }     /* Avg Disk: "Moy. disque" (fr) 11ch */
+th:nth-child(11) { width: 96px; }      /* TX (GB): "发送 (GB)" (zh) 9ch */
 
 th.right { text-align: right; }
 
