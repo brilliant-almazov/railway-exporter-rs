@@ -1,7 +1,6 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-import { useEffect, useState } from 'react'
 import type { ApiStatusResponse } from '@/types'
 
 const STATUS_KEY = ['server-status']
@@ -12,8 +11,6 @@ interface UseServerStatusOptions {
 }
 
 export function useServerStatus({ apiHost, initialData }: UseServerStatusOptions) {
-  const [uptime, setUptime] = useState(initialData?.uptime_seconds ?? 0)
-
   const query = useQuery({
     queryKey: STATUS_KEY,
     queryFn: async () => {
@@ -30,24 +27,8 @@ export function useServerStatus({ apiHost, initialData }: UseServerStatusOptions
     refetchOnWindowFocus: false,
   })
 
-  // Initialize uptime from server status
-  useEffect(() => {
-    if (query.data) {
-      setUptime(query.data.uptime_seconds)
-    }
-  }, [query.data])
-
-  // Uptime ticker - increment every second
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setUptime(prev => prev + 1)
-    }, 1000)
-    return () => clearInterval(timer)
-  }, [])
-
   return {
     serverStatus: query.data ?? null,
-    uptime,
     isLoading: query.isLoading,
     error: query.error,
     refetch: query.refetch,

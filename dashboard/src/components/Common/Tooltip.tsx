@@ -1,6 +1,6 @@
 'use client'
 
-import type { ReactNode } from 'react'
+import { useState, useEffect, type ReactNode } from 'react'
 
 type TooltipPosition = 'top' | 'bottom' | 'left' | 'right' | 'bottom-end' | 'bottom-start'
 
@@ -15,11 +15,19 @@ export function Tooltip({
   children,
   position = 'top',
 }: TooltipProps) {
+  // Render tooltip content only on client to avoid hydration mismatch
+  // (metric values change between SSR and client)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
   return (
     <span className={`tooltip-trigger tooltip-${position}`}>
       {children}
       <span className="tooltip-bubble" role="tooltip">
-        {content}
+        {mounted ? content : null}
       </span>
     </span>
   )

@@ -18,6 +18,7 @@ import type { InitialData } from '@/lib/api.server'
 interface DashboardProps {
   apiHost: string
   initialData: InitialData
+  initialLang: Language
 }
 
 // Calculate totals from services (used for SSR initial state)
@@ -35,6 +36,7 @@ function calculateTotals(services: ServiceMetrics[]): FilteredTotals {
     diskGbMinutes: activeServices.reduce((a, s) => a + s.diskGbMinutes, 0),
     avgDisk: activeServices.reduce((a, s) => a + s.avgDisk, 0),
     networkTxGb: activeServices.reduce((a, s) => a + s.networkTxGb, 0),
+    includesDeleted: false,
   }
 }
 
@@ -48,10 +50,11 @@ const defaultTotals: FilteredTotals = {
   diskGbMinutes: 0,
   avgDisk: 0,
   networkTxGb: 0,
+  includesDeleted: false,
 }
 
-export function Dashboard({ apiHost, initialData }: DashboardProps) {
-  const { language, setLanguage } = useLanguage()
+export function Dashboard({ apiHost, initialData, initialLang }: DashboardProps) {
+  const { language, locale, dir, setLanguage } = useLanguage(initialLang)
   const isCompact = useCompactMode(50)
   // Default to WebSocket if backend has it enabled
   const [useWebSocket, setUseWebSocket] = useState(
@@ -64,7 +67,7 @@ export function Dashboard({ apiHost, initialData }: DashboardProps) {
     () => initialData.metrics ? calculateTotals(initialData.metrics.services) : defaultTotals
   )
 
-  const { serverStatus, uptime } = useServerStatus({
+  const { serverStatus } = useServerStatus({
     apiHost,
     initialData: initialData.serverStatus,
   })
@@ -140,15 +143,17 @@ export function Dashboard({ apiHost, initialData }: DashboardProps) {
             filteredTotals={filteredTotals}
             updated={justUpdated}
             isCompact={isCompact}
+            dir={dir}
             t={t}
           />
 
-          <Legend language={language} isCompact={isCompact} />
+          <Legend language={language} dir={dir} isCompact={isCompact} />
 
           <ServicesTable
             services={metrics.services}
             groups={groups}
             language={language}
+            dir={dir}
             onTotalsChange={handleTotalsChange}
             t={t}
           />
@@ -158,8 +163,8 @@ export function Dashboard({ apiHost, initialData }: DashboardProps) {
       <Footer
         serverStatus={serverStatus}
         metrics={metrics ?? null}
-        uptime={uptime}
         lastUpdate={lastUpdate}
+        locale={locale}
       />
     </div>
   )

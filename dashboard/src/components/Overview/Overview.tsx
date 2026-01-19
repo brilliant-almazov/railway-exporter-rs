@@ -3,8 +3,7 @@
 import { StatCard } from './StatCard'
 import { formatCurrency, formatNumber, formatInteger } from '@/lib/formatters'
 import { colors } from '@/styles/colors'
-import { useDirection } from '@/hooks/useDirection'
-import type { Translations } from '@/i18n/keys'
+import type { Translations, TextDirection } from '@/i18n/keys'
 import type { ParsedMetrics, FilteredTotals } from '@/types'
 
 interface OverviewProps {
@@ -12,6 +11,7 @@ interface OverviewProps {
   filteredTotals: FilteredTotals
   updated?: boolean
   isCompact?: boolean
+  dir: TextDirection
   t: Translations
 }
 
@@ -20,9 +20,9 @@ export function Overview({
   filteredTotals,
   updated = false,
   isCompact = false,
+  dir,
   t
 }: OverviewProps) {
-  const dir = useDirection()
   const className = isCompact ? 'overview compact' : 'overview'
 
   return (

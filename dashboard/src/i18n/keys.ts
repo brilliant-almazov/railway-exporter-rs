@@ -16,18 +16,19 @@ export interface LanguageConfig {
   name: string
   flag: string
   dir: TextDirection
+  locale: string  // BCP 47 locale tag for formatting
 }
 
 export const LANGUAGES: Record<string, LanguageConfig> = {
-  en: { code: 'en', name: 'English', flag: '🇺🇸', dir: TextDirection.LTR },
-  ru: { code: 'ru', name: 'Русский', flag: '🇷🇺', dir: TextDirection.LTR },
-  uk: { code: 'uk', name: 'Українська', flag: '🇺🇦', dir: TextDirection.LTR },
-  de: { code: 'de', name: 'Deutsch', flag: '🇩🇪', dir: TextDirection.LTR },
-  fr: { code: 'fr', name: 'Français', flag: '🇫🇷', dir: TextDirection.LTR },
-  es: { code: 'es', name: 'Español', flag: '🇪🇸', dir: TextDirection.LTR },
-  zh: { code: 'zh', name: '中文', flag: '🇨🇳', dir: TextDirection.LTR },
-  he: { code: 'he', name: 'עברית', flag: '🇮🇱', dir: TextDirection.RTL },
-  kk: { code: 'kk', name: 'Қазақша', flag: '🇰🇿', dir: TextDirection.LTR },
+  en: { code: 'en', name: 'English', flag: '🇺🇸', dir: TextDirection.LTR, locale: 'en-US' },
+  ru: { code: 'ru', name: 'Русский', flag: '🇷🇺', dir: TextDirection.LTR, locale: 'ru-RU' },
+  uk: { code: 'uk', name: 'Українська', flag: '🇺🇦', dir: TextDirection.LTR, locale: 'uk-UA' },
+  de: { code: 'de', name: 'Deutsch', flag: '🇩🇪', dir: TextDirection.LTR, locale: 'de-DE' },
+  fr: { code: 'fr', name: 'Français', flag: '🇫🇷', dir: TextDirection.LTR, locale: 'fr-FR' },
+  es: { code: 'es', name: 'Español', flag: '🇪🇸', dir: TextDirection.LTR, locale: 'es-ES' },
+  zh: { code: 'zh', name: '中文', flag: '🇨🇳', dir: TextDirection.LTR, locale: 'zh-CN' },
+  he: { code: 'he', name: 'עברית', flag: '🇮🇱', dir: TextDirection.RTL, locale: 'he-IL' },
+  kk: { code: 'kk', name: 'Қазақша', flag: '🇰🇿', dir: TextDirection.LTR, locale: 'kk-KZ' },
 } as const
 
 export type Language = keyof typeof LANGUAGES

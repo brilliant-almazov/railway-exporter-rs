@@ -6,15 +6,15 @@ import { SortIndicator } from '@/components/ServicesTable/SortIndicator'
 import { ServiceRow } from '@/components/ServicesTable/ServiceRow'
 import { Tooltip } from '@/components/Common/Tooltip'
 import { useUrlFilters } from '@/hooks/useUrlFilters'
-import { useDirection } from '@/hooks/useDirection'
 import { formatCurrency, formatNumber, formatOrDash, formatRaw } from '@/lib/formatters'
-import type { Translations } from '@/i18n/keys'
+import type { Translations, TextDirection } from '@/i18n/keys'
 import type { ServiceMetrics, FilteredTotals } from '@/types'
 
 interface ServicesTableProps {
   services: ServiceMetrics[]
   groups: string[]
   language: string
+  dir: TextDirection
   t: Translations
   onTotalsChange?: (totals: FilteredTotals) => void
 }
@@ -23,10 +23,10 @@ export function ServicesTable({
   services,
   groups,
   language,
+  dir,
   t,
   onTotalsChange
 }: ServicesTableProps) {
-  const dir = useDirection()
   // URL-synced filters (snake_case params: ?search=x&group=y&show_deleted=true)
   const {
     search: filterService,
@@ -93,7 +93,8 @@ export function ServicesTable({
     diskGbMinutes: filteredServices.reduce((a, s) => a + s.diskGbMinutes, 0),
     avgDisk: filteredServices.reduce((a, s) => a + s.avgDisk, 0),
     networkTxGb: filteredServices.reduce((a, s) => a + s.networkTxGb, 0),
-  }), [filteredServices])
+    includesDeleted: showDeleted && filteredServices.some(s => s.isDeleted),
+  }), [filteredServices, showDeleted])
 
   // Notify parent of totals change (in effect to avoid setState during render)
   useEffect(() => {

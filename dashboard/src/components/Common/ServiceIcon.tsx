@@ -26,9 +26,11 @@ export function ServiceIcon({ url, name }: ServiceIconProps) {
   } as const
 
   // Server sent URL (base64 or regular) - use as img src
+  // next/image doesn't work well with base64 data URIs or external URLs from arbitrary hosts
   if (url) {
     return (
       <span className="service-icon-wrapper" style={containerStyle}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={url}
           alt={name}

@@ -4,6 +4,8 @@ interface StatCardProps {
   subtitle?: string
   color?: string
   updated?: boolean
+  /** Show asterisk marker when totals include deleted services */
+  includesDeleted?: boolean
 }
 
 export function StatCard({
@@ -11,12 +13,18 @@ export function StatCard({
   value,
   subtitle,
   color = '#1a73e8',
-  updated = false
+  updated = false,
+  includesDeleted = false
 }: StatCardProps) {
   return (
     <div className={`stat-card ${updated ? 'updated' : ''}`}>
       <div className="stat-title">{title}</div>
-      <div className="stat-value" style={{ color }}>{value}</div>
+      <div className="stat-value">
+        <span style={{ color }}>{value}</span>
+        {includesDeleted && (
+          <span className="deleted-marker">*</span>
+        )}
+      </div>
       {subtitle && <div className="stat-subtitle">{subtitle}</div>}
     </div>
   )

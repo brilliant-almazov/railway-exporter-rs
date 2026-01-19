@@ -36,7 +36,7 @@
 html, body {
   height: 100vh;
   width: 100%;
-  overflow: hidden;  /* Prevent body scroll */
+  overflow: hidden;
 }
 
 body {
@@ -50,7 +50,7 @@ body {
 }
 
 .app {
-  height: 100vh;  /* Fixed height, not min-height */
+  height: 100vh;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -288,12 +288,12 @@ header h1 {
 
 /* Main content */
 main {
-  flex: 1;
+  flex: 1 1 0;  /* Grow to fill space, shrink if needed, zero basis */
   padding: 16px 24px;
   display: flex;
   flex-direction: column;
   min-height: 0;
-  overflow: hidden;  /* Contains overflow, passes to children */
+  overflow: hidden;  /* Content scrolls inside table-container */
   transition: padding 0.3s ease;
 }
 
@@ -313,7 +313,7 @@ h3 {
   font-size: 16px;
   font-weight: 600;
   color: #5f6368;
-  margin-bottom: 10px;
+  margin-bottom: 0;
   text-align: center;
 }
 
@@ -411,6 +411,15 @@ h3 {
   font-weight: 600;
   margin-bottom: 4px;
   transition: font-size 0.3s ease, margin 0.3s ease;
+}
+
+/* Deleted marker asterisk (shown when "Show deleted" is active) */
+.deleted-marker {
+  color: #ea4335;
+  font-size: 0.7em;
+  font-weight: 600;
+  vertical-align: super;
+  margin-left: 2px;
 }
 
 .stat-subtitle {
@@ -518,7 +527,7 @@ h3 {
 /* Services Wrapper - contains section + side Clear button */
 .services-wrapper {
   position: relative;
-  flex: 1;  /* Take remaining space */
+  flex: 1 1 0;  /* Grow to fill available space */
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -575,15 +584,16 @@ h3 {
 .services-section {
   background: white;
   border-radius: 8px;
-  padding: 16px 20px;
+  padding: 16px;  /* Equal padding all sides */
   box-shadow: 0 1px 3px rgba(0,0,0,0.08);
   border: 1px solid #e8eaed;
-  flex: 1;  /* Take remaining space */
+  flex: 1 1 0;  /* Grow to fill available space */
   display: flex;
   flex-direction: column;
-  min-height: 100px;
+  min-height: 0;  /* Allow shrinking */
   overflow: hidden;  /* Contains overflow */
   transition: padding 0.3s ease;
+  margin-bottom: 0;  /* Override section margin - last element before footer */
 }
 
 /* Services Header with Filters */
@@ -591,10 +601,11 @@ h3 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   flex-wrap: wrap;
   gap: 12px;
   position: relative;
+  flex-shrink: 0;  /* Don't shrink header */
 }
 
 .filters {
@@ -617,6 +628,10 @@ h3 {
   font-size: 12px;
   color: #5f6368;
   font-weight: 500;
+  /* Fixed width: max is "Tjeneste:" (no) = 9ch + colon */
+  min-width: 70px;
+  display: inline-block;
+  text-align: right;  /* Align labels to the right for consistent gap */
 }
 
 .filter-input {
@@ -668,6 +683,9 @@ h3 {
   border-radius: 4px;
   background: white;
   border: 1px solid #dadce0;
+  /* Fixed width: max is "Eliminados" (es) 10ch + checkbox + padding */
+  min-width: 115px;
+  white-space: nowrap;
 }
 
 .filter-toggle:hover {
@@ -829,42 +847,19 @@ h3 {
 
 /* Table container */
 .table-container {
-  flex: 1;  /* Take remaining space in services-section */
+  flex: 1 1 0;  /* Grow to fill available space */
   min-height: 0;
   overflow-y: auto;  /* Enable vertical scroll */
   overflow-x: hidden;
 }
 
-/* Subtle scrollbar - thin, appears on hover */
+/* Invisible scrollbar - works but hidden */
 .table-container {
-  scrollbar-width: thin;
-  scrollbar-color: transparent transparent;
-}
-
-.table-container:hover {
-  scrollbar-color: rgba(0,0,0,0.2) transparent;
+  scrollbar-width: none;  /* Firefox */
 }
 
 .table-container::-webkit-scrollbar {
-  width: 4px;
-}
-
-.table-container::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.table-container::-webkit-scrollbar-thumb {
-  background: transparent;
-  border-radius: 2px;
-  transition: background 0.2s ease;
-}
-
-.table-container:hover::-webkit-scrollbar-thumb {
-  background: rgba(0,0,0,0.15);
-}
-
-.table-container::-webkit-scrollbar-thumb:hover {
-  background: rgba(0,0,0,0.25);
+  display: none;  /* Chrome, Safari */
 }
 
 /* Table - fixed layout for stable column widths */
@@ -921,7 +916,7 @@ tbody::-webkit-scrollbar-thumb:hover {
 /* Columns auto-size based on content */
 
 th {
-  padding: 10px 8px;
+  padding: 8px 6px;
   text-align: left;
   font-weight: 600;
   color: #5f6368;
@@ -1105,8 +1100,8 @@ tfoot {
 .totals-row td {
   border-top: 2px solid #e8eaed;
   border-bottom: none;
-  padding-top: 12px;
-  padding-bottom: 12px;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 
 tfoot td {
@@ -1345,9 +1340,10 @@ tfoot td {
 /* Footer - always at bottom (sticky footer pattern) */
 footer {
   background: #f8f9fa;
-  padding: 0 24px 16px;
-  margin-top: auto;
+  padding: 16px 24px;  /* Same padding as main */
   flex-shrink: 0;
+  position: relative;
+  z-index: 10;
 }
 
 .footer-inner {
@@ -1611,7 +1607,7 @@ footer {
   }
 
   .services-section {
-    padding: 12px 16px;
+    padding: 12px;
   }
 }
 
@@ -1709,7 +1705,7 @@ footer {
   }
 
   .services-section {
-    padding: 10px 12px;
+    padding: 10px;
   }
 }
 
@@ -1757,7 +1753,7 @@ footer {
   }
 
   .services-section {
-    padding: 8px 10px;
+    padding: 8px;
   }
 
   header {

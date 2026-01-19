@@ -55,7 +55,7 @@ export function useMetrics({
     }
   }, [queryClient])
 
-  // WebSocket connection
+  // WebSocket connection - delay to ensure hydration completes first
   useEffect(() => {
     if (!useWebSocket) return
 
@@ -87,9 +87,11 @@ export function useMetrics({
       }
     }
 
-    connect()
+    // Small delay to let hydration complete before connecting
+    const initTimeout = setTimeout(connect, 100)
 
     return () => {
+      clearTimeout(initTimeout)
       if (reconnectTimeoutRef.current) {
         clearTimeout(reconnectTimeoutRef.current)
       }

@@ -88,6 +88,7 @@ export interface FilteredTotals {
   avgCpu: number
   avgMemory: number
   avgDisk: number
+  includesDeleted?: boolean  // True when "Show deleted" filter is active
 }
 
 // Icon cache statistics from backend

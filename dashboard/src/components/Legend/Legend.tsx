@@ -1,16 +1,15 @@
 'use client'
 
-import { useDirection } from '@/hooks/useDirection'
-import { type Language } from '@/i18n/keys'
+import { type Language, type TextDirection } from '@/i18n/keys'
 import legendTranslations from '@/i18n/legend.json'
 
 interface LegendProps {
   language: Language
+  dir: TextDirection
   isCompact?: boolean
 }
 
-export function Legend({ language, isCompact = false }: LegendProps) {
-  const dir = useDirection()
+export function Legend({ language, dir, isCompact = false }: LegendProps) {
   const t = (legendTranslations as Record<Language, typeof legendTranslations.en>)[language] || legendTranslations.en
   const className = isCompact ? 'legend-section hidden' : 'legend-section'
 
