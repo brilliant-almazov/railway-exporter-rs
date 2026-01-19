@@ -1129,7 +1129,6 @@ tfoot td {
   display: flex;
   align-items: center;
   gap: 6px;
-  min-width: 150px;  /* Prevent column collapse when filtering */
 }
 
 /* Icon wrapper - fixed size to prevent layout shift */
