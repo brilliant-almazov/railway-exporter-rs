@@ -5,6 +5,7 @@
 //! gzip compression (if configured), and calling `.body()` + `.unwrap()`.
 
 mod health;
+mod icons;
 mod metrics;
 mod status;
 
@@ -12,6 +13,7 @@ mod status;
 mod tests;
 
 pub use health::handle as health;
+pub use icons::handle as icons;
 pub use metrics::handle_json as metrics_json;
 pub use metrics::handle_prometheus as metrics_prometheus;
 pub use status::handle as status;

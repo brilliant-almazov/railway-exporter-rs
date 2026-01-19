@@ -27,6 +27,7 @@ futures-util = "0.3"
 sysinfo = "0.32"
 flate2 = "1"
 lru = "0.12"
+urlencoding = "2"
 
 # Memory allocator with better memory return to OS (Linux only)
 [target.'cfg(all(target_os = "linux", not(target_env = "msvc")))'.dependencies]

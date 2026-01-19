@@ -116,6 +116,18 @@ async fn route_request(
         }
         "/status" | "/" => handlers::status(&state).await,
         "/health" => handlers::health(),
+        _ if path.starts_with("/static/icons/services/") => {
+            // Extract service name from path: /static/icons/services/{service_name}
+            let service_name = &path["/static/icons/services/".len()..];
+            if service_name.is_empty() {
+                handlers::not_found()
+            } else {
+                // URL decode the service name
+                let decoded = urlencoding::decode(service_name)
+                    .unwrap_or_else(|_| service_name.into());
+                handlers::icons(&state, &decoded).await
+            }
+        }
         _ => handlers::not_found(),
     };
 

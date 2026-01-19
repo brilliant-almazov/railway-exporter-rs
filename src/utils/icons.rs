@@ -15,9 +15,9 @@ use tracing::{debug, warn};
 
 /// Cached icon data: content type and raw bytes.
 #[derive(Clone)]
-struct CachedIcon {
-    content_type: String,
-    data: Vec<u8>,
+pub struct CachedIcon {
+    pub content_type: String,
+    pub data: Vec<u8>,
 }
 
 impl CachedIcon {
@@ -152,6 +152,38 @@ impl IconCache {
             .collect();
 
         join_all(futures).await;
+    }
+
+    /// Gets raw icon data from cache (for serving via /static/icons endpoint).
+    /// Returns None if not cached - caller should trigger fetch first.
+    pub async fn get_raw(&self, service_name: &str) -> Option<CachedIcon> {
+        let mut cache = self.cache.lock().await;
+        cache.get(service_name).cloned()
+    }
+
+    /// Ensures icon is cached, fetching if needed. Returns true if cached/fetched successfully.
+    pub async fn ensure_cached(&self, service_name: &str, icon_url: &str) -> bool {
+        // Already cached?
+        {
+            let cache = self.cache.lock().await;
+            if cache.contains(service_name) {
+                return true;
+            }
+        }
+
+        // Try to fetch
+        if icon_url.is_empty() || icon_url.starts_with("data:") {
+            return false;
+        }
+
+        match self.fetch_icon(icon_url).await {
+            Ok(icon) => {
+                let mut cache = self.cache.lock().await;
+                cache.put(service_name.to_string(), icon);
+                true
+            }
+            Err(_) => false,
+        }
     }
 
     /// Returns the number of cached icons.

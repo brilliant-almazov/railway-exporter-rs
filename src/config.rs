@@ -30,6 +30,8 @@
 //! icon_cache:
 //!   enabled: true       # Enable icon caching (default: true)
 //!   max_count: 200      # Max icons to cache (default: 200)
+//!   mode: link          # "base64" = embed in JSON, "link" = serve from /static/icons/services/{name}
+//!   max_age: 86400      # Browser cache TTL in seconds (for mode: link, default: 86400 = 1 day)
 //!
 //! pricing:
 //!   - name: hobby
@@ -182,6 +184,34 @@ impl Default for GzipConfig {
     }
 }
 
+/// Icon delivery mode.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Deserialize, Serialize)]
+#[serde(rename_all = "lowercase")]
+pub enum IconMode {
+    /// Embed icons as base64 data URLs in JSON responses.
+    /// Larger payload but no additional requests needed.
+    #[default]
+    Base64,
+    /// Return URLs to /icons/{service} endpoint.
+    /// Smaller JSON payload, browser caches icons separately.
+    Link,
+}
+
+impl IconMode {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            IconMode::Base64 => "base64",
+            IconMode::Link => "link",
+        }
+    }
+}
+
+impl fmt::Display for IconMode {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
 /// Icon cache configuration.
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct IconCacheConfig {
@@ -191,6 +221,13 @@ pub struct IconCacheConfig {
     /// Maximum number of icons to cache (LRU eviction).
     #[serde(default = "default_icon_cache_max_count")]
     pub max_count: usize,
+    /// Icon delivery mode: "base64" or "link".
+    #[serde(default)]
+    pub mode: IconMode,
+    /// Browser cache TTL in seconds (for mode: link).
+    /// Default: 86400 (1 day).
+    #[serde(default = "default_icon_cache_max_age")]
+    pub max_age: u32,
 }
 
 fn default_icon_cache_enabled() -> bool {
@@ -199,12 +236,17 @@ fn default_icon_cache_enabled() -> bool {
 fn default_icon_cache_max_count() -> usize {
     200
 }
+fn default_icon_cache_max_age() -> u32 {
+    86400 // 1 day
+}
 
 impl Default for IconCacheConfig {
     fn default() -> Self {
         Self {
             enabled: default_icon_cache_enabled(),
             max_count: default_icon_cache_max_count(),
+            mode: IconMode::default(),
+            max_age: default_icon_cache_max_age(),
         }
     }
 }

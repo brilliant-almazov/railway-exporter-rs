@@ -1,6 +1,7 @@
 //! Metrics collection from Railway API.
 
 use crate::client::{ApiError, Client};
+use crate::config::IconMode;
 use crate::state::AppState;
 use crate::types::{MetricsJson, ProjectSummary, ServiceData, WsMessage};
 use chrono::{Datelike, Utc};
@@ -70,15 +71,33 @@ pub async fn collect_metrics(
         })
         .collect();
 
-    // Second pass: fetch icons and convert to Base64 data URLs (if caching enabled)
-    debug!("Fetching icons for {} services", services_raw.len());
+    // Second pass: process icons based on mode
+    debug!("Processing icons for {} services (mode: {})", services_raw.len(), config.icon_cache.mode);
     let mut services: HashMap<String, (String, String, String)> = HashMap::new();
     for (id, name, icon_url, group) in services_raw {
-        let icon_data = if config.icon_cache.enabled {
-            state.icon_cache.get_icon(&name, &icon_url).await
-        } else {
+        let icon_data = if !config.icon_cache.enabled {
             // Caching disabled - use original URL as-is
             icon_url.clone()
+        } else {
+            match config.icon_cache.mode {
+                IconMode::Base64 => {
+                    // Fetch and return as base64 data URL
+                    state.icon_cache.get_icon(&name, &icon_url).await
+                }
+                IconMode::Link => {
+                    // Ensure icon is cached, return URL to our endpoint
+                    if !icon_url.is_empty() && !icon_url.starts_with("data:") {
+                        state.icon_cache.ensure_cached(&name, &icon_url).await;
+                        format!("/static/icons/services/{}", urlencoding::encode(&name))
+                    } else if icon_url.starts_with("data:") {
+                        // Already a data URL - use as-is
+                        icon_url.clone()
+                    } else {
+                        // Empty URL
+                        String::new()
+                    }
+                }
+            }
         };
         services.insert(id, (name, icon_data, group));
     }
