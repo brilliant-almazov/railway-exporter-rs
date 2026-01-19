@@ -13,7 +13,7 @@
 //! - `config` - YAML configuration loading
 //! - `metrics` - Prometheus metrics definitions
 //! - `pricing` - Railway pricing calculations
-//! - `railway` - GraphQL API client
+//! - `client` - Railway GraphQL API client
 //! - `types` - Shared data types
 //! - `state` - Application state management
 //! - `collector` - Metrics collection logic
@@ -24,7 +24,7 @@ pub mod config;
 pub mod handlers;
 pub mod metrics;
 pub mod pricing;
-pub mod railway;
+pub mod client;
 pub mod server;
 pub mod state;
 pub mod types;
@@ -33,3 +33,35 @@ pub mod utils;
 pub use config::{Config, Plan};
 pub use metrics::Metrics;
 pub use state::AppState;
+
+#[cfg(test)]
+#[path = "config_test.rs"]
+mod config_test;
+
+#[cfg(test)]
+#[path = "types_test.rs"]
+mod types_test;
+
+#[cfg(test)]
+#[path = "state_test.rs"]
+mod state_test;
+
+#[cfg(test)]
+#[path = "client_test.rs"]
+mod client_test;
+
+#[cfg(test)]
+#[path = "collector_test.rs"]
+mod collector_test;
+
+#[cfg(test)]
+#[path = "server_test.rs"]
+mod server_test;
+
+#[cfg(test)]
+#[path = "metrics_test.rs"]
+mod metrics_test;
+
+#[cfg(test)]
+#[path = "pricing_test.rs"]
+mod pricing_test;

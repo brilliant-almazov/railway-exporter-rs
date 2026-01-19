@@ -1,17 +1,17 @@
 //! Metrics collection from Railway API.
 
-use crate::railway::{ApiError, RailwayClient};
+use crate::client::{ApiError, Client};
 use crate::state::AppState;
 use crate::types::{MetricsJson, ProjectSummary, ServiceData, WsMessage};
 use chrono::{Datelike, Utc};
 use std::collections::HashMap;
 use std::sync::Arc;
 use std::time::Instant;
-use tracing::info;
+use tracing::{debug, info};
 
 /// Collects metrics from Railway API and updates Prometheus gauges.
 pub async fn collect_metrics(
-    client: &RailwayClient,
+    client: &Client,
     state: &Arc<AppState>,
 ) -> Result<(), ApiError> {
     let start = Instant::now();
@@ -50,14 +50,15 @@ pub async fn collect_metrics(
 
     let project_name = &project.name;
 
-    // Build service map: id -> (name, icon, group)
-    let services: HashMap<String, (String, String, String)> = project
+    // Build service map: id -> (name, icon_url, group)
+    // First pass: collect service info with original icon URLs
+    let services_raw: Vec<(String, String, String, String)> = project
         .services
         .edges
         .iter()
         .map(|e| {
             let name = e.node.name.clone();
-            let icon = e.node.icon.clone().unwrap_or_default();
+            let icon_url = e.node.icon.clone().unwrap_or_default();
             // Find group for this service
             let group = config
                 .service_groups
@@ -65,9 +66,22 @@ pub async fn collect_metrics(
                 .find(|(_, patterns)| patterns.iter().any(|p| name.contains(p) || p == &name))
                 .map(|(g, _)| g.clone())
                 .unwrap_or_else(|| "ungrouped".to_string());
-            (e.node.id.clone(), (name, icon, group))
+            (e.node.id.clone(), name, icon_url, group)
         })
         .collect();
+
+    // Second pass: fetch icons and convert to Base64 data URLs (if caching enabled)
+    debug!("Fetching icons for {} services", services_raw.len());
+    let mut services: HashMap<String, (String, String, String)> = HashMap::new();
+    for (id, name, icon_url, group) in services_raw {
+        let icon_data = if config.icon_cache.enabled {
+            state.icon_cache.get_icon(&name, &icon_url).await
+        } else {
+            // Caching disabled - use original URL as-is
+            icon_url.clone()
+        };
+        services.insert(id, (name, icon_data, group));
+    }
 
     // Get usage metrics
     let usage = client.get_usage(&config.project_id).await?;
@@ -83,7 +97,6 @@ pub async fn collect_metrics(
         let mem = *measurements.get("MEMORY_USAGE_GB").unwrap_or(&0.0);
         let disk = *measurements.get("DISK_USAGE_GB").unwrap_or(&0.0);
         let tx = *measurements.get("NETWORK_TX_GB").unwrap_or(&0.0);
-        let rx = *measurements.get("NETWORK_RX_GB").unwrap_or(&0.0);
 
         let labels = &[
             name.as_str(),
@@ -96,7 +109,6 @@ pub async fn collect_metrics(
         metrics.memory_usage.with_label_values(labels).set(mem);
         metrics.disk_usage.with_label_values(labels).set(disk);
         metrics.network_tx.with_label_values(labels).set(tx);
-        metrics.network_rx.with_label_values(labels).set(rx);
 
         let cost = cpu * config.pricing.get_price("CPU_USAGE")
             + mem * config.pricing.get_price("MEMORY_USAGE_GB")
@@ -118,7 +130,6 @@ pub async fn collect_metrics(
             memory_usage: mem,
             disk_usage: disk,
             network_tx: tx,
-            network_rx: rx,
             cost_usd: cost,
             estimated_monthly_usd: 0.0, // Updated below
             is_deleted,
@@ -235,7 +246,7 @@ pub async fn collect_metrics(
 }
 
 /// Calculates days in a given month.
-fn days_in_current_month(year: i32, month: u32) -> u32 {
+pub(crate) fn days_in_current_month(year: i32, month: u32) -> u32 {
     if month == 12 {
         chrono::NaiveDate::from_ymd_opt(year + 1, 1, 1)
     } else {

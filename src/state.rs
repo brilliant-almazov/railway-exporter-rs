@@ -2,7 +2,7 @@
 
 use crate::metrics::Metrics;
 use crate::types::MetricsJson;
-use crate::utils::ProcessInfoProvider;
+use crate::utils::{create_icon_cache, ProcessInfoProvider, SharedIconCache};
 use crate::Config;
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::time::Instant;
@@ -39,15 +39,17 @@ pub struct AppState {
     pub process_info: ProcessInfoProvider,
     /// Number of active WebSocket clients.
     pub ws_clients: AtomicU32,
+    /// Icon cache - stores Base64 data URLs for service icons.
+    pub icon_cache: SharedIconCache,
 }
 
 impl AppState {
     /// Creates new application state.
     pub fn new(config: Config) -> Self {
         let (ws_tx, _) = broadcast::channel::<String>(16);
+        let icon_cache_capacity = config.icon_cache.max_count;
 
         Self {
-            config,
             metrics: Metrics::new(),
             metrics_json: RwLock::new(None),
             start_time: Instant::now(),
@@ -55,6 +57,8 @@ impl AppState {
             ws_broadcast: ws_tx,
             process_info: ProcessInfoProvider::new(),
             ws_clients: AtomicU32::new(0),
+            icon_cache: create_icon_cache(icon_cache_capacity),
+            config,
         }
     }
 

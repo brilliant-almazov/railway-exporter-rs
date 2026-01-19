@@ -17,7 +17,6 @@ pub struct ServiceData {
     pub memory_usage: f64,
     pub disk_usage: f64,
     pub network_tx: f64,
-    pub network_rx: f64,
     pub cost_usd: f64,
     pub estimated_monthly_usd: f64,
     #[serde(rename = "isDeleted")]
@@ -62,6 +61,8 @@ pub enum WsMessage {
 #[derive(Serialize, Debug, Clone)]
 pub struct WsStatus {
     pub uptime_seconds: u64,
+    pub memory_mb: f64,
+    pub cpu_percent: f32,
     pub api: ApiStatus,
     pub ws_clients: u32,
 }
@@ -80,6 +81,7 @@ pub struct ServerStatus {
     pub config: ConfigStatus,
     pub process: ProcessStatus,
     pub api: ApiStatus,
+    pub icon_cache: crate::utils::IconCacheStats,
 }
 
 /// Endpoint availability status (from config).
@@ -100,6 +102,10 @@ pub struct ConfigStatus {
     /// List of group names (for frontend dropdown).
     pub service_groups: Vec<String>,
     pub prices: PriceValues,
+    /// Gzip compression configuration from YAML.
+    pub gzip: crate::config::GzipConfig,
+    /// Icon cache configuration from YAML.
+    pub icon_cache: crate::config::IconCacheConfig,
 }
 
 #[derive(Serialize, Debug)]

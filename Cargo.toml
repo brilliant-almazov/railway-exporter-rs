@@ -22,9 +22,16 @@ tracing = "0.1"
 tracing-subscriber = "0.3"
 serde_yaml = "0.9"
 base64 = "0.22"
-tokio-tungstenite = "0.24"
+tokio-tungstenite = "0.28.0"
 futures-util = "0.3"
 sysinfo = "0.32"
+flate2 = "1"
+lru = "0.12"
+
+# Memory allocator with better memory return to OS (Linux only)
+[target.'cfg(all(target_os = "linux", not(target_env = "msvc")))'.dependencies]
+tikv-jemallocator = { version = "0.6", features = ["background_threads"] }
+tikv-jemalloc-ctl = "0.6"
 
 [profile.release]
 lto = true

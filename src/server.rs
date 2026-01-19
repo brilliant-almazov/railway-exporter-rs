@@ -88,6 +88,14 @@ async fn route_request(
 ) -> Result<Response<Full<Bytes>>, Infallible> {
     let path = req.uri().path();
 
+    // Check if client accepts gzip
+    let accepts_gzip = req
+        .headers()
+        .get("Accept-Encoding")
+        .and_then(|v| v.to_str().ok())
+        .map(|v| v.contains("gzip"))
+        .unwrap_or(false);
+
     // WebSocket is handled at TCP level before reaching here
     // Route to handlers, get (Builder, Bytes) tuple
     let response = match path {
@@ -111,13 +119,19 @@ async fn route_request(
         _ => handlers::not_found(),
     };
 
-    // Finalize: add CORS headers if enabled, build response
-    Ok(handlers::finalize(response, state.config.cors_enabled))
+    // Finalize: add CORS headers if enabled, gzip if configured, build response
+    Ok(handlers::finalize(
+        response,
+        state.config.cors_enabled,
+        accepts_gzip,
+        &state.config.gzip,
+    ))
 }
 
 /// Handles WebSocket connections.
 pub async fn handle_websocket(state: Arc<AppState>, stream: tokio::net::TcpStream) {
     use crate::types::{ApiStatus, WsMessage, WsStatus};
+    use crate::utils::ProcessInfoProvider;
 
     info!("Starting WebSocket handshake...");
     let ws_stream = match tokio_tungstenite::accept_async(stream).await {
@@ -137,10 +151,16 @@ pub async fn handle_websocket(state: Arc<AppState>, stream: tokio::net::TcpStrea
 
     let (mut ws_sender, mut ws_receiver) = ws_stream.split();
 
-    // Helper to build WsStatus
-    let build_status = |state: &AppState, api_status: &crate::state::ApiStatusData| -> WsStatus {
+    // Process info provider for memory/cpu stats
+    let process_info = ProcessInfoProvider::new();
+
+    // Helper to build WsStatus with current process stats
+    let build_status = |state: &AppState, api_status: &crate::state::ApiStatusData, process_info: &ProcessInfoProvider| -> WsStatus {
+        let proc_status = process_info.status();
         WsStatus {
             uptime_seconds: state.start_time.elapsed().as_secs(),
+            memory_mb: proc_status.memory_mb,
+            cpu_percent: proc_status.cpu_percent,
             api: ApiStatus {
                 last_success: api_status.last_success,
                 last_error: api_status.last_error.clone(),
@@ -156,10 +176,10 @@ pub async fn handle_websocket(state: Arc<AppState>, stream: tokio::net::TcpStrea
         let api_status = state.api_status.read().await;
 
         // Send status first
-        let status_msg = WsMessage::Status(build_status(&state, &api_status));
+        let status_msg = WsMessage::Status(build_status(&state, &api_status, &process_info));
         if let Ok(json) = serde_json::to_string(&status_msg) {
             info!("Sending initial status ({} bytes)", json.len());
-            if let Err(e) = ws_sender.send(Message::Text(json.into())).await {
+            if let Err(e) = ws_sender.send(Message::Text(json)).await {
                 warn!("Failed to send initial status: {}", e);
                 state.ws_client_disconnect();
                 return;
@@ -171,7 +191,7 @@ pub async fn handle_websocket(state: Arc<AppState>, stream: tokio::net::TcpStrea
             let metrics_msg = WsMessage::Metrics(metrics.clone());
             if let Ok(json) = serde_json::to_string(&metrics_msg) {
                 info!("Sending initial metrics ({} bytes)", json.len());
-                if let Err(e) = ws_sender.send(Message::Text(json.into())).await {
+                if let Err(e) = ws_sender.send(Message::Text(json)).await {
                     warn!("Failed to send initial metrics: {}", e);
                     state.ws_client_disconnect();
                     return;
@@ -193,10 +213,10 @@ pub async fn handle_websocket(state: Arc<AppState>, stream: tokio::net::TcpStrea
             // Periodic status updates
             _ = status_ticker.tick() => {
                 let api_status = state.api_status.read().await;
-                let status_msg = WsMessage::Status(build_status(&state, &api_status));
+                let status_msg = WsMessage::Status(build_status(&state, &api_status, &process_info));
                 if let Ok(json) = serde_json::to_string(&status_msg) {
                     info!("Sending periodic status update");
-                    if ws_sender.send(Message::Text(json.into())).await.is_err() {
+                    if ws_sender.send(Message::Text(json)).await.is_err() {
                         info!("Client disconnected during status send");
                         state.ws_client_disconnect();
                         break;
@@ -221,7 +241,7 @@ pub async fn handle_websocket(state: Arc<AppState>, stream: tokio::net::TcpStrea
             update = rx.recv() => {
                 match update {
                     Ok(json) => {
-                        if ws_sender.send(Message::Text(json.into())).await.is_err() {
+                        if ws_sender.send(Message::Text(json)).await.is_err() {
                             state.ws_client_disconnect();
                             break;
                         }

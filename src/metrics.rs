@@ -12,7 +12,6 @@
 //! | `railway_memory_usage_gb_minutes` | Memory usage in GB-minutes |
 //! | `railway_disk_usage_gb_minutes` | Disk usage in GB-minutes |
 //! | `railway_network_tx_gb` | Network egress in GB |
-//! | `railway_network_rx_gb` | Network ingress in GB |
 //! | `railway_service_cost_usd` | Current cost in USD |
 //! | `railway_service_estimated_monthly_usd` | Estimated monthly cost |
 //!
@@ -50,8 +49,6 @@ pub struct Metrics {
     pub disk_usage: GaugeVec,
     /// Network egress in GB per service.
     pub network_tx: GaugeVec,
-    /// Network ingress in GB per service.
-    pub network_rx: GaugeVec,
     /// Current cost in USD per service.
     pub service_cost: GaugeVec,
     /// Estimated monthly cost in USD per service.
@@ -122,12 +119,6 @@ impl Metrics {
 
         let network_tx = GaugeVec::new(
             Opts::new("railway_network_tx_gb", "Network egress in GB"),
-            service_labels,
-        )
-        .unwrap();
-
-        let network_rx = GaugeVec::new(
-            Opts::new("railway_network_rx_gb", "Network ingress in GB"),
             service_labels,
         )
         .unwrap();
@@ -229,7 +220,6 @@ impl Metrics {
         registry.register(Box::new(memory_usage.clone())).unwrap();
         registry.register(Box::new(disk_usage.clone())).unwrap();
         registry.register(Box::new(network_tx.clone())).unwrap();
-        registry.register(Box::new(network_rx.clone())).unwrap();
         registry.register(Box::new(service_cost.clone())).unwrap();
         registry
             .register(Box::new(service_estimated_monthly.clone()))
@@ -264,7 +254,6 @@ impl Metrics {
             memory_usage,
             disk_usage,
             network_tx,
-            network_rx,
             service_cost,
             service_estimated_monthly,
             current_usage,
@@ -313,7 +302,6 @@ impl Metrics {
         self.memory_usage.reset();
         self.disk_usage.reset();
         self.network_tx.reset();
-        self.network_rx.reset();
         self.service_cost.reset();
         self.service_estimated_monthly.reset();
         self.current_usage.reset();
@@ -326,55 +314,5 @@ impl Metrics {
         self.api_up.reset();
         self.exporter_memory_bytes.reset();
         self.exporter_cpu_percent.reset();
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_metrics_new() {
-        let metrics = Metrics::new();
-        let output = metrics.encode();
-        assert!(!output.is_empty());
-    }
-
-    #[test]
-    fn test_metrics_with_service_labels() {
-        let metrics = Metrics::new();
-        metrics
-            .cpu_usage
-            .with_label_values(&["web", "myproject", "🌐", "frontend"])
-            .set(1234.5);
-
-        let output = metrics.encode();
-        assert!(output.contains("railway_cpu_usage_vcpu_minutes{"));
-        assert!(output.contains("service=\"web\""));
-        assert!(output.contains("group=\"frontend\""));
-    }
-
-    #[test]
-    fn test_metrics_reset() {
-        let metrics = Metrics::new();
-        metrics
-            .cpu_usage
-            .with_label_values(&["api", "prod", "", "backend"])
-            .set(1000.0);
-
-        metrics.reset();
-
-        let output = metrics.encode();
-        assert!(!output.contains("1000"));
-    }
-
-    #[test]
-    fn test_process_metrics() {
-        let metrics = Metrics::new();
-        metrics.update_process_metrics();
-
-        let output = metrics.encode();
-        assert!(output.contains("railway_exporter_memory_bytes"));
-        assert!(output.contains("railway_exporter_cpu_percent"));
     }
 }
