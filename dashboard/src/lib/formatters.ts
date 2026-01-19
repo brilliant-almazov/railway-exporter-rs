@@ -147,3 +147,19 @@ export function formatRelativeTime(date: Date): string {
   if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`
   return `${Math.floor(seconds / 3600)}h ago`
 }
+
+/**
+ * Format bytes as human-readable size (e.g., "1.5 KB", "2.3 MB", "1.2 GB", "0.5 TB")
+ */
+export function formatBytes(bytes: number): string {
+  const KB = 1024
+  const MB = KB * 1024
+  const GB = MB * 1024
+  const TB = GB * 1024
+
+  if (bytes < KB) return `${bytes} B`
+  if (bytes < MB) return `${(bytes / KB).toFixed(1)} KB`
+  if (bytes < GB) return `${(bytes / MB).toFixed(1)} MB`
+  if (bytes < TB) return `${(bytes / GB).toFixed(2)} GB`
+  return `${(bytes / TB).toFixed(2)} TB`
+}

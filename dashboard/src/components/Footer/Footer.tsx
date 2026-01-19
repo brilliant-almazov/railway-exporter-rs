@@ -1,6 +1,6 @@
 'use client'
 
-import { formatUptime, formatMb, formatMs } from '@/lib/formatters'
+import { formatUptime, formatMb, formatMs, formatBytes } from '@/lib/formatters'
 import type { ApiStatusResponse, ParsedMetrics } from '@/types'
 
 interface FooterProps {
@@ -11,6 +11,19 @@ interface FooterProps {
 }
 
 export function Footer({ serverStatus, metrics, uptime, lastUpdate }: FooterProps) {
+  const cacheConfig = serverStatus?.config.icon_cache
+  const cacheStats = serverStatus?.icon_cache
+  const cacheEnabled = cacheConfig?.enabled ?? false
+
+  // Build tooltip content for enabled cache
+  const cacheTooltip = cacheEnabled && cacheStats ? [
+    `Count: ${cacheStats.count}/${cacheConfig?.max_count ?? '?'}`,
+    `Size: ${formatBytes(cacheStats.total_bytes)}`,
+    `Avg: ${formatBytes(cacheStats.avg_bytes)}`,
+    `Min: ${formatBytes(cacheStats.min_bytes)}`,
+    `Max: ${formatBytes(cacheStats.max_bytes)}`,
+  ].join('\n') : undefined
+
   return (
     <footer>
       <div className="footer-inner">
@@ -20,7 +33,12 @@ export function Footer({ serverStatus, metrics, uptime, lastUpdate }: FooterProp
             <span className="footer-server">
               • PID {serverStatus.process.pid}
               • {formatMb(serverStatus.process.memory_mb)}
-              • ⏱ {formatUptime(uptime)}
+              • {formatUptime(uptime)}
+            </span>
+          )}
+          {cacheConfig && (
+            <span className="footer-server" title={cacheTooltip}>
+              • Cache: {cacheEnabled ? 'on' : 'off'}
             </span>
           )}
         </span>

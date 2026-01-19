@@ -9,7 +9,6 @@ export interface ServiceMetrics {
   memoryGbMinutes: number
   diskGbMinutes: number
   networkTxGb: number
-  networkRxGb: number
   avgCpu: number
   avgMemory: number
   avgDisk: number
@@ -49,7 +48,6 @@ export interface ApiServiceData {
   memory_usage: number
   disk_usage: number
   network_tx: number
-  network_rx: number
   cost_usd: number
   estimated_monthly_usd: number
   isDeleted: boolean
@@ -103,10 +101,19 @@ export interface FilteredTotals {
   memoryGbMinutes: number
   diskGbMinutes: number
   networkTxGb: number
-  networkRxGb: number
   avgCpu: number
   avgMemory: number
   avgDisk: number
+}
+
+// Icon cache statistics from backend
+export interface IconCacheStats {
+  count: number
+  total_bytes: number
+  min_bytes: number
+  max_bytes: number
+  median_bytes: number
+  avg_bytes: number
 }
 
 // Server status response from /status endpoint
@@ -125,6 +132,21 @@ export interface ApiStatusResponse {
     scrape_interval_seconds: number
     api_url: string
     service_groups: string[]
+    prices: {
+      cpu_per_vcpu_minute: number
+      memory_per_gb_minute: number
+      disk_per_gb_minute: number
+      network_egress_per_gb: number
+    }
+    gzip: {
+      enabled: boolean
+      min_size: number
+      level: number
+    }
+    icon_cache: {
+      enabled: boolean
+      max_count: number
+    }
   }
   process: {
     pid: number
@@ -137,4 +159,5 @@ export interface ApiStatusResponse {
     total_scrapes: number
     failed_scrapes: number
   }
+  icon_cache: IconCacheStats
 }
