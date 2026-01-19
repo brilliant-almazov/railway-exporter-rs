@@ -461,7 +461,7 @@ async fn test_websocket_ping_pong() {
     let _ = ws_stream.next().await;
 
     // Send ping
-    ws_stream.send(Message::Ping(vec![1, 2, 3])).await.unwrap();
+    ws_stream.send(Message::Ping(vec![1, 2, 3].into())).await.unwrap();
 
     // Should receive pong with same data
     // Note: The pong might come interleaved with status updates

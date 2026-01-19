@@ -179,7 +179,7 @@ pub async fn handle_websocket(state: Arc<AppState>, stream: tokio::net::TcpStrea
         let status_msg = WsMessage::Status(build_status(&state, &api_status, &process_info));
         if let Ok(json) = serde_json::to_string(&status_msg) {
             info!("Sending initial status ({} bytes)", json.len());
-            if let Err(e) = ws_sender.send(Message::Text(json)).await {
+            if let Err(e) = ws_sender.send(Message::Text(json.into())).await {
                 warn!("Failed to send initial status: {}", e);
                 state.ws_client_disconnect();
                 return;
@@ -191,7 +191,7 @@ pub async fn handle_websocket(state: Arc<AppState>, stream: tokio::net::TcpStrea
             let metrics_msg = WsMessage::Metrics(metrics.clone());
             if let Ok(json) = serde_json::to_string(&metrics_msg) {
                 info!("Sending initial metrics ({} bytes)", json.len());
-                if let Err(e) = ws_sender.send(Message::Text(json)).await {
+                if let Err(e) = ws_sender.send(Message::Text(json.into())).await {
                     warn!("Failed to send initial metrics: {}", e);
                     state.ws_client_disconnect();
                     return;
@@ -216,7 +216,7 @@ pub async fn handle_websocket(state: Arc<AppState>, stream: tokio::net::TcpStrea
                 let status_msg = WsMessage::Status(build_status(&state, &api_status, &process_info));
                 if let Ok(json) = serde_json::to_string(&status_msg) {
                     info!("Sending periodic status update");
-                    if ws_sender.send(Message::Text(json)).await.is_err() {
+                    if ws_sender.send(Message::Text(json.into())).await.is_err() {
                         info!("Client disconnected during status send");
                         state.ws_client_disconnect();
                         break;
@@ -241,7 +241,7 @@ pub async fn handle_websocket(state: Arc<AppState>, stream: tokio::net::TcpStrea
             update = rx.recv() => {
                 match update {
                     Ok(json) => {
-                        if ws_sender.send(Message::Text(json)).await.is_err() {
+                        if ws_sender.send(Message::Text(json.into())).await.is_err() {
                             state.ws_client_disconnect();
                             break;
                         }
