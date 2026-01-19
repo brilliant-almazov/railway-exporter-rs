@@ -232,15 +232,15 @@ export function ServicesTable({
             <tfoot>
               <tr className="totals-row">
                 <td colSpan={2}><strong>{t.total} ({filteredServices.length})</strong></td>
-                <td className="right money"><strong>{formatCurrency(filteredTotals.cost)}</strong></td>
-                <td className="right money"><strong>{formatCurrency(filteredTotals.estimatedMonthly)}</strong></td>
-                <td className="right"><strong>{formatNumber(filteredTotals.cpuMinutes, 0)}</strong></td>
-                <td className="right highlight"><strong>{formatNumber(filteredTotals.avgCpu, 4)}</strong></td>
-                <td className="right"><strong>{formatNumber(filteredTotals.memoryGbMinutes, 0)}</strong></td>
-                <td className="right highlight"><strong>{formatNumber(filteredTotals.avgMemory, 4)}</strong></td>
-                <td className="right"><strong>{formatNumber(filteredTotals.diskGbMinutes, 0)}</strong></td>
-                <td className="right highlight"><strong>{formatNumber(filteredTotals.avgDisk, 4)}</strong></td>
-                <td className="right"><strong>{formatNumber(filteredTotals.networkTxGb, 4)}</strong></td>
+                <td className="right money" title={String(filteredTotals.cost)}><strong>{formatCurrency(filteredTotals.cost)}</strong></td>
+                <td className="right money" title={String(filteredTotals.estimatedMonthly)}><strong>{formatCurrency(filteredTotals.estimatedMonthly)}</strong></td>
+                <td className="right" title={String(filteredTotals.cpuMinutes)}><strong>{formatNumber(filteredTotals.cpuMinutes, 0)}</strong></td>
+                <td className="right highlight" title={String(filteredTotals.avgCpu)}><strong>{formatNumber(filteredTotals.avgCpu, 4)}</strong></td>
+                <td className="right" title={String(filteredTotals.memoryGbMinutes)}><strong>{formatNumber(filteredTotals.memoryGbMinutes, 0)}</strong></td>
+                <td className="right highlight" title={String(filteredTotals.avgMemory)}><strong>{formatNumber(filteredTotals.avgMemory, 4)}</strong></td>
+                <td className="right" title={String(filteredTotals.diskGbMinutes)}><strong>{formatNumber(filteredTotals.diskGbMinutes, 0)}</strong></td>
+                <td className="right highlight" title={String(filteredTotals.avgDisk)}><strong>{formatNumber(filteredTotals.avgDisk, 4)}</strong></td>
+                <td className="right" title={String(filteredTotals.networkTxGb)}><strong>{formatNumber(filteredTotals.networkTxGb, 4)}</strong></td>
               </tr>
             </tfoot>
           </table>
