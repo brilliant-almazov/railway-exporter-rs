@@ -35,6 +35,20 @@ service_groups:
 cors_enabled: true
 websocket_enabled: true
 
+# Gzip compression settings
+gzip:
+  enabled: true      # Enable gzip compression for HTTP responses
+  min_size: 256      # Minimum response size in bytes to compress
+  level: 5           # Compression level: 1 (fast) to 9 (best)
+
+# Icon cache settings (LRU cache, stores raw bytes)
+icon_cache:
+  enabled: true      # Enable icon caching
+  max_count: 200     # Max icons to cache (LRU eviction)
+  # TODO: not implemented yet
+  # max_bytes: 0     # Max cache size in bytes (0 = unlimited)
+  # ttl_seconds: 0   # Icon TTL (0 = no expiry)
+
 pricing:
   - name: hobby
     price:

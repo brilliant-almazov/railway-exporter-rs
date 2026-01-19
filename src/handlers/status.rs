@@ -29,6 +29,9 @@ pub async fn handle(state: &AppState) -> HandlerResponse {
     // Get group names from config
     let service_groups: Vec<String> = state.config.service_groups.keys().cloned().collect();
 
+    // Get icon cache statistics
+    let icon_cache = state.icon_cache.stats().await;
+
     let status = ServerStatus {
         version: env!("CARGO_PKG_VERSION"),
         project_name: state.config.project_name.clone(),
@@ -40,6 +43,8 @@ pub async fn handle(state: &AppState) -> HandlerResponse {
             api_url: state.config.api_url.clone(),
             service_groups,
             prices: state.config.pricing_values.clone(),
+            gzip: state.config.gzip.clone(),
+            icon_cache: state.config.icon_cache.clone(),
         },
         process,
         api: ApiStatus {
@@ -48,6 +53,7 @@ pub async fn handle(state: &AppState) -> HandlerResponse {
             total_scrapes: api_status.total_scrapes,
             failed_scrapes: api_status.failed_scrapes,
         },
+        icon_cache,
     };
 
     (

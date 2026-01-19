@@ -20,11 +20,26 @@
 //! port: 9090
 //! scrape_interval: 300
 //!
+//! # Gzip compression settings
+//! gzip:
+//!   enabled: true       # Enable gzip compression (default: true)
+//!   min_size: 256       # Minimum response size in bytes (default: 256)
+//!   level: 1            # Compression level 1-9 (default: 1 = fast)
+//!
+//! # Icon cache settings (LRU cache with raw bytes storage)
+//! icon_cache:
+//!   enabled: true       # Enable icon caching (default: true)
+//!   max_count: 200      # Max icons to cache (default: 200)
+//!
 //! pricing:
-//!   cpu: 0.000231
-//!   memory: 0.000116
-//!   disk: 0.000021
-//!   network: 0.10
+//!   - name: hobby
+//!     price:
+//!       cpu: 0.000463
+//!       memory: 0.000231
+//!   - name: pro
+//!     price:
+//!       cpu: 0.000231
+//!       memory: 0.000116
 //!
 //! service_groups:
 //!   monitoring:
@@ -110,30 +125,94 @@ impl<'de> Deserialize<'de> for Plan {
 
 /// YAML configuration structure.
 #[derive(Debug, Deserialize, Default)]
-struct YamlConfig {
-    railway_api_token: Option<String>,
-    railway_project_id: Option<String>,
-    railway_plan: Option<Plan>,
-    railway_api_url: Option<String>,
-    port: Option<u16>,
-    scrape_interval: Option<u16>,
-    pricing: Option<PricingSection>,
-    service_groups: Option<HashMap<String, Vec<String>>>,
+pub(crate) struct YamlConfig {
+    pub(crate) railway_api_token: Option<String>,
+    pub(crate) railway_project_id: Option<String>,
+    pub(crate) railway_plan: Option<Plan>,
+    pub(crate) railway_api_url: Option<String>,
+    pub(crate) port: Option<u16>,
+    pub(crate) scrape_interval: Option<u16>,
+    pub(crate) pricing: Option<PricingSection>,
+    pub(crate) service_groups: Option<HashMap<String, Vec<String>>>,
     /// Project display name (for /status endpoint).
-    project_name: Option<String>,
+    pub(crate) project_name: Option<String>,
     /// Enable CORS headers on all responses.
-    cors_enabled: Option<bool>,
+    pub(crate) cors_enabled: Option<bool>,
     /// Enable WebSocket endpoint.
-    websocket_enabled: Option<bool>,
+    pub(crate) websocket_enabled: Option<bool>,
+    /// Gzip compression settings.
+    pub(crate) gzip: Option<GzipConfig>,
+    /// Icon cache settings.
+    pub(crate) icon_cache: Option<IconCacheConfig>,
 }
 
 use serde::Serialize;
+
+/// Gzip compression configuration.
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct GzipConfig {
+    /// Enable gzip compression for HTTP responses.
+    #[serde(default = "default_gzip_enabled")]
+    pub enabled: bool,
+    /// Minimum response size in bytes to trigger compression.
+    #[serde(default = "default_gzip_min_size")]
+    pub min_size: usize,
+    /// Compression level (1-9). 1 = fast, 9 = best compression.
+    #[serde(default = "default_gzip_level")]
+    pub level: u32,
+}
+
+fn default_gzip_enabled() -> bool {
+    true
+}
+fn default_gzip_min_size() -> usize {
+    256
+}
+fn default_gzip_level() -> u32 {
+    1
+}
+
+impl Default for GzipConfig {
+    fn default() -> Self {
+        Self {
+            enabled: default_gzip_enabled(),
+            min_size: default_gzip_min_size(),
+            level: default_gzip_level(),
+        }
+    }
+}
+
+/// Icon cache configuration.
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct IconCacheConfig {
+    /// Enable icon caching.
+    #[serde(default = "default_icon_cache_enabled")]
+    pub enabled: bool,
+    /// Maximum number of icons to cache (LRU eviction).
+    #[serde(default = "default_icon_cache_max_count")]
+    pub max_count: usize,
+}
+
+fn default_icon_cache_enabled() -> bool {
+    true
+}
+fn default_icon_cache_max_count() -> usize {
+    200
+}
+
+impl Default for IconCacheConfig {
+    fn default() -> Self {
+        Self {
+            enabled: default_icon_cache_enabled(),
+            max_count: default_icon_cache_max_count(),
+        }
+    }
+}
 
 /// Network pricing (tx/rx).
 #[derive(Debug, Deserialize, Serialize, Default, Clone)]
 pub struct NetworkPricing {
     pub tx: Option<f64>,
-    pub rx: Option<f64>,
 }
 
 /// Price values for a plan.
@@ -208,6 +287,12 @@ pub struct Config {
 
     /// Enable WebSocket endpoint.
     pub websocket_enabled: bool,
+
+    /// Gzip compression settings.
+    pub gzip: GzipConfig,
+
+    /// Icon cache settings.
+    pub icon_cache: IconCacheConfig,
 }
 
 /// Error type for configuration loading.
@@ -318,9 +403,6 @@ impl Config {
                     if let Some(tx) = network.tx {
                         pricing.set_price("NETWORK_TX_GB", tx);
                     }
-                    if let Some(rx) = network.rx {
-                        pricing.set_price("NETWORK_RX_GB", rx);
-                    }
                 }
             }
         }
@@ -343,6 +425,16 @@ impl Config {
         let cors_enabled = yaml_config.cors_enabled.unwrap_or(true);
         let websocket_enabled = yaml_config.websocket_enabled.unwrap_or(true);
 
+        // Gzip configuration with validation
+        let gzip = yaml_config.gzip.unwrap_or_default();
+        if gzip.level < 1 || gzip.level > 9 {
+            return Err(ConfigError::InvalidValue(
+                "gzip.level must be between 1 and 9".to_string(),
+            ));
+        }
+
+        let icon_cache = yaml_config.icon_cache.unwrap_or_default();
+
         Ok(Self {
             api_token,
             project_id,
@@ -356,6 +448,8 @@ impl Config {
             project_name,
             cors_enabled,
             websocket_enabled,
+            gzip,
+            icon_cache,
         })
     }
 
@@ -438,127 +532,8 @@ impl Config {
             project_name: project_id.to_string(),
             cors_enabled: true,
             websocket_enabled: true,
+            gzip: GzipConfig::default(),
+            icon_cache: IconCacheConfig::default(),
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_config_new() {
-        let config = Config::new("token", "project", Plan::Pro, 60, 8080);
-        assert_eq!(config.api_token, "token");
-        assert_eq!(config.project_id, "project");
-        assert_eq!(config.plan, Plan::Pro);
-        assert_eq!(config.scrape_interval, 60);
-        assert_eq!(config.port, 8080);
-        assert!(config.service_groups.is_empty());
-    }
-
-    #[test]
-    fn test_config_api_url() {
-        let config = Config::new("t", "p", Plan::Hobby, 60, 8080);
-        assert_eq!(config.api_url, DEFAULT_API_URL);
-    }
-
-    #[test]
-    fn test_config_error_display() {
-        let err = ConfigError::MissingValue("TEST".to_string());
-        assert_eq!(format!("{}", err), "Missing required config: TEST");
-
-        let err = ConfigError::YamlError("invalid".to_string());
-        assert_eq!(format!("{}", err), "YAML parse error: invalid");
-
-        let err = ConfigError::ParseError("PORT".to_string(), "not a number".to_string());
-        assert_eq!(format!("{}", err), "Failed to parse PORT: not a number");
-
-        let err = ConfigError::FileError("not found".to_string());
-        assert_eq!(format!("{}", err), "Config file error: not found");
-
-        let err = ConfigError::Base64Error("invalid".to_string());
-        assert_eq!(format!("{}", err), "Base64 decode error: invalid");
-
-        let err = ConfigError::InvalidPlan("enterprise".to_string());
-        assert_eq!(
-            format!("{}", err),
-            "Invalid plan 'enterprise': must be 'hobby' or 'pro'"
-        );
-    }
-
-    #[test]
-    fn test_config_pricing_uses_plan() {
-        let hobby = Config::new("t", "p", Plan::Hobby, 60, 8080);
-        let pro = Config::new("t", "p", Plan::Pro, 60, 8080);
-
-        // Pro should have lower CPU price
-        assert!(pro.pricing.get_price("CPU_USAGE") < hobby.pricing.get_price("CPU_USAGE"));
-    }
-
-    #[test]
-    fn test_plan_from_str() {
-        assert_eq!(Plan::from_str("hobby").unwrap(), Plan::Hobby);
-        assert_eq!(Plan::from_str("HOBBY").unwrap(), Plan::Hobby);
-        assert_eq!(Plan::from_str("pro").unwrap(), Plan::Pro);
-        assert_eq!(Plan::from_str("PRO").unwrap(), Plan::Pro);
-        assert_eq!(Plan::from_str("Pro").unwrap(), Plan::Pro);
-    }
-
-    #[test]
-    fn test_plan_from_str_invalid() {
-        let result = Plan::from_str("enterprise");
-        assert!(result.is_err());
-        match result.unwrap_err() {
-            ConfigError::InvalidPlan(v) => assert_eq!(v, "enterprise"),
-            _ => panic!("Expected InvalidPlan error"),
-        }
-    }
-
-    #[test]
-    fn test_plan_display() {
-        assert_eq!(format!("{}", Plan::Hobby), "hobby");
-        assert_eq!(format!("{}", Plan::Pro), "pro");
-    }
-
-    #[test]
-    fn test_plan_as_str() {
-        assert_eq!(Plan::Hobby.as_str(), "hobby");
-        assert_eq!(Plan::Pro.as_str(), "pro");
-    }
-
-    #[test]
-    fn test_plan_default() {
-        assert_eq!(Plan::default(), Plan::Hobby);
-    }
-
-    #[test]
-    fn test_yaml_config_deserialize() {
-        let yaml = r#"
-railway_api_token: test-token
-railway_project_id: test-project
-railway_plan: pro
-port: 9090
-scrape_interval: 120
-service_groups:
-  monitoring:
-    - prometheus
-    - grafana
-  database:
-    - postgres
-"#;
-        let config: YamlConfig = serde_yaml::from_str(yaml).unwrap();
-        assert_eq!(config.railway_api_token.unwrap(), "test-token");
-        assert_eq!(config.railway_project_id.unwrap(), "test-project");
-        assert_eq!(config.railway_plan.unwrap(), Plan::Pro);
-        assert_eq!(config.port.unwrap(), 9090);
-        assert_eq!(config.scrape_interval.unwrap(), 120);
-
-        let groups = config.service_groups.unwrap();
-        assert_eq!(
-            groups.get("monitoring").unwrap(),
-            &vec!["prometheus", "grafana"]
-        );
-        assert_eq!(groups.get("database").unwrap(), &vec!["postgres"]);
     }
 }
