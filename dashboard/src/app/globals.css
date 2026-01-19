@@ -911,10 +911,11 @@ th, td {
   white-space: nowrap;  /* Prevent wrapping, let content determine width */
 }
 
-/* Service and Group columns - fit content, no extra space */
+/* Service and Group can truncate if too long */
 td:nth-child(1), td:nth-child(2) {
-  width: 1%;  /* Shrink to fit content */
-  white-space: nowrap;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 thead {
