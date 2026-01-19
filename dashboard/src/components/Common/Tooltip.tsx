@@ -1,37 +1,29 @@
 'use client'
 
-import Tippy from '@tippyjs/react'
-import 'tippy.js/dist/tippy.css'
-import {isValidElement} from 'react'
-import type {ReactNode, ReactElement} from 'react'
-import type {Placement} from 'tippy.js'
+import type { ReactNode } from 'react'
+
+type TooltipPosition = 'top' | 'bottom' | 'left' | 'right' | 'bottom-end' | 'bottom-start'
 
 interface TooltipProps {
   content: ReactNode
   children: ReactNode
-  placement?: Placement
-  delay?: number
+  position?: TooltipPosition
 }
 
-export function Tooltip({content, children, placement = 'auto', delay = 150}: TooltipProps) {
-  // Tippy needs a single React element that can receive a ref
-  // If children is already a valid element (like <button>), pass directly
-  // Otherwise, wrap in a span
-  const child = isValidElement(children)
-    ? children
-    : <span className="tooltip-wrapper">{children}</span>
-
+export function Tooltip({
+  content,
+  children,
+  position = 'top',
+}: TooltipProps) {
   return (
-    <Tippy
-      content={content}
-      placement={placement}
-      delay={[delay, 0]}
-      arrow={true}
-      theme="custom"
-      maxWidth={400}
-      appendTo={() => document.body}
-    >
-      {child as ReactElement}
-    </Tippy>
+    <span className={`tooltip-trigger tooltip-${position}`}>
+      {children}
+      <span className="tooltip-bubble" role="tooltip">
+        {content}
+      </span>
+    </span>
   )
 }
+
+// Keep for backwards compatibility but not used
+export const TooltipProvider = ({ children }: { children: ReactNode; delayDuration?: number }) => children

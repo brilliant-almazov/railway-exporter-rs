@@ -1,10 +1,15 @@
 // Language configuration - all metadata in one place
 // Add new languages here with all their properties
 
+import uiTranslations from './ui.json'
+
 export enum TextDirection {
   LTR = 'ltr',
   RTL = 'rtl',
 }
+
+// Translation type derived from actual JSON structure
+export type Translations = typeof uiTranslations.en
 
 export interface LanguageConfig {
   code: string

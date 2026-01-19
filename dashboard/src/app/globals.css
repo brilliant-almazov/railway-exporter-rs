@@ -965,7 +965,9 @@ td.highlight { background: #f0f7ff; font-weight: 500; color: #1a73e8; }
 tbody tr {
   transition: background 0.15s ease-out, opacity 0.2s ease-out;
 }
-tbody tr:hover { background: #f8f9fa; }
+tbody tr:hover {
+  background: #e8f0fe;
+}
 
 /* No results row */
 .no-results {
@@ -1187,29 +1189,126 @@ tfoot td {
   }
 }
 
-/* Tippy.js custom theme */
-.tippy-box[data-theme~='custom'] {
+/* CSS-only Tooltip */
+.tooltip-trigger {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.tooltip-bubble {
+  position: absolute;
   background: #202124;
   color: white;
   font-size: 13px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   border-radius: 6px;
-  padding: 2px 4px;
+  padding: 6px 10px;
   box-shadow: 0 4px 14px rgba(0,0,0,0.25);
   z-index: 9999;
+  white-space: nowrap;
+  max-width: 400px;
+  line-height: 1.4;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease-out, visibility 0.15s ease-out;
 }
 
-.tippy-box[data-theme~='custom'] .tippy-arrow {
-  color: #202124;
+/* Arrow (pseudo-element) */
+.tooltip-bubble::before {
+  content: '';
+  position: absolute;
+  border: 6px solid transparent;
 }
 
-.tippy-box[data-theme~='custom'] .tippy-content {
-  padding: 6px 10px;
+.tooltip-trigger:hover .tooltip-bubble {
+  opacity: 1;
+  visibility: visible;
 }
 
-/* Tooltip wrapper - hugs content, doesn't stretch */
-.tooltip-wrapper {
-  display: inline;
+/* Position: top (default) */
+.tooltip-top .tooltip-bubble {
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+}
+.tooltip-top .tooltip-bubble::before {
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-top-color: #202124;
+}
+
+/* Position: bottom */
+.tooltip-bottom .tooltip-bubble {
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+}
+.tooltip-bottom .tooltip-bubble::before {
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-bottom-color: #202124;
+}
+
+/* Position: left */
+.tooltip-left .tooltip-bubble {
+  right: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%);
+}
+.tooltip-left .tooltip-bubble::before {
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  border-left-color: #202124;
+}
+
+/* Position: right */
+.tooltip-right .tooltip-bubble {
+  left: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%);
+}
+.tooltip-right .tooltip-bubble::before {
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  border-right-color: #202124;
+}
+
+/* Position: bottom-end (diagonal right) */
+.tooltip-bottom-end .tooltip-bubble {
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: none;
+}
+.tooltip-bottom-end .tooltip-bubble::before {
+  bottom: calc(100% - 6px);
+  left: -4px;
+  width: 10px;
+  height: 10px;
+  background: #202124;
+  transform: rotate(45deg);
+  border: none;
+}
+
+/* Position: bottom-start (diagonal left) */
+.tooltip-bottom-start .tooltip-bubble {
+  top: calc(100% + 8px);
+  right: 50%;
+  transform: none;
+}
+.tooltip-bottom-start .tooltip-bubble::before {
+  bottom: calc(100% - 6px);
+  right: -4px;
+  width: 10px;
+  height: 10px;
+  background: #202124;
+  transform: rotate(45deg);
+  border: none;
 }
 
 /* Footer - always at bottom (sticky footer pattern) */

@@ -123,12 +123,7 @@ export function Dashboard({ apiHost, initialData }: DashboardProps) {
         onWebSocketToggle={handleWebSocketToggle}
         onRefresh={handleRefresh}
         onShowRaw={handleShowRaw}
-        translations={{
-          refresh: t.refresh,
-          showRaw: t.showRaw,
-          wsRealtime: t.wsRealtime,
-          pollInterval: t.pollInterval,
-        }}
+        t={t}
       />
 
       {(error || initialData.error) && (
@@ -145,15 +140,7 @@ export function Dashboard({ apiHost, initialData }: DashboardProps) {
             filteredTotals={filteredTotals}
             updated={justUpdated}
             isCompact={isCompact}
-            translations={{
-              currentSpend: t.currentSpend,
-              estimatedMonthly: t.estimatedMonthly,
-              dailyAverage: t.dailyAverage,
-              minutesElapsed: t.minutesElapsed,
-              projectedTotal: t.projectedTotal,
-              perDayCost: t.perDayCost,
-              services: t.services,
-            }}
+            t={t}
           />
 
           <Legend language={language} isCompact={isCompact} />
@@ -163,25 +150,7 @@ export function Dashboard({ apiHost, initialData }: DashboardProps) {
             groups={groups}
             language={language}
             onTotalsChange={handleTotalsChange}
-            translations={{
-              services: t.services,
-              service: t.service,
-              group: t.group,
-              cost: t.cost,
-              forecast: t.forecast,
-              cpuMin: t.cpuMin,
-              avgVcpu: t.avgVcpu,
-              ramGbMin: t.ramGbMin,
-              avgRam: t.avgRam,
-              diskGbMin: t.diskGbMin,
-              avgDisk: t.avgDisk,
-              txGb: t.txGb,
-              total: t.total,
-              filterByService: t.filterByService,
-              allGroups: t.allGroups,
-              showDeleted: t.showDeleted,
-              clear: t.clear,
-            }}
+            t={t}
           />
         </main>
       )}

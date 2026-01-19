@@ -25,47 +25,47 @@ function ServiceRowComponent({ service: svc }: ServiceRowProps) {
         {svc.isDeleted ? '—' : <span className="group-badge">{svc.group}</span>}
       </td>
       <td className="right money">
-        <Tooltip content={formatRaw(svc.cost, '$')}>
+        <Tooltip position="right" content={formatRaw(svc.cost, '$')}>
           {formatCurrency(svc.cost)}
         </Tooltip>
       </td>
       <td className="right money">
-        <Tooltip content={formatRaw(svc.estimatedMonthly, '$')}>
+        <Tooltip position="right" content={formatRaw(svc.estimatedMonthly, '$')}>
           {formatCurrency(svc.estimatedMonthly)}
         </Tooltip>
       </td>
       <td className="right">
-        <Tooltip content={svc.cpuMinutes}>
+        <Tooltip position="right" content={svc.cpuMinutes}>
           {formatNumber(svc.cpuMinutes, 0)}
         </Tooltip>
       </td>
       <td className="right highlight">
-        <Tooltip content={svc.avgCpu}>
+        <Tooltip position="right" content={svc.avgCpu}>
           {formatNumber(svc.avgCpu, 4)}
         </Tooltip>
       </td>
       <td className="right">
-        <Tooltip content={svc.memoryGbMinutes}>
+        <Tooltip position="right" content={svc.memoryGbMinutes}>
           {formatNumber(svc.memoryGbMinutes, 0)}
         </Tooltip>
       </td>
       <td className="right highlight">
-        <Tooltip content={svc.avgMemory}>
+        <Tooltip position="right" content={svc.avgMemory}>
           {formatNumber(svc.avgMemory, 4)}
         </Tooltip>
       </td>
       <td className="right">
-        <Tooltip content={svc.diskGbMinutes}>
+        <Tooltip position="right" content={svc.diskGbMinutes}>
           {formatOrDash(svc.diskGbMinutes, 0)}
         </Tooltip>
       </td>
       <td className="right highlight">
-        <Tooltip content={svc.avgDisk}>
+        <Tooltip position="right" content={svc.avgDisk}>
           {formatOrDash(svc.avgDisk, 4)}
         </Tooltip>
       </td>
       <td className="right">
-        <Tooltip content={svc.networkTxGb}>
+        <Tooltip position="right" content={svc.networkTxGb}>
           {formatOrDash(svc.networkTxGb, 4)}
         </Tooltip>
       </td>

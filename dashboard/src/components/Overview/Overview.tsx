@@ -4,6 +4,7 @@ import { StatCard } from './StatCard'
 import { formatCurrency, formatNumber, formatInteger } from '@/lib/formatters'
 import { colors } from '@/styles/colors'
 import { useDirection } from '@/hooks/useDirection'
+import type { Translations } from '@/i18n/keys'
 import type { ParsedMetrics, FilteredTotals } from '@/types'
 
 interface OverviewProps {
@@ -11,15 +12,7 @@ interface OverviewProps {
   filteredTotals: FilteredTotals
   updated?: boolean
   isCompact?: boolean
-  translations: {
-    currentSpend: string
-    estimatedMonthly: string
-    dailyAverage: string
-    minutesElapsed: string
-    projectedTotal: string
-    perDayCost: string
-    services: string
-  }
+  t: Translations
 }
 
 export function Overview({
@@ -27,7 +20,7 @@ export function Overview({
   filteredTotals,
   updated = false,
   isCompact = false,
-  translations: t
+  t
 }: OverviewProps) {
   const dir = useDirection()
   const className = isCompact ? 'overview compact' : 'overview'

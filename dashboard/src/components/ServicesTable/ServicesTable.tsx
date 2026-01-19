@@ -8,31 +8,14 @@ import { Tooltip } from '@/components/Common/Tooltip'
 import { useUrlFilters } from '@/hooks/useUrlFilters'
 import { useDirection } from '@/hooks/useDirection'
 import { formatCurrency, formatNumber, formatOrDash, formatRaw } from '@/lib/formatters'
+import type { Translations } from '@/i18n/keys'
 import type { ServiceMetrics, FilteredTotals } from '@/types'
 
 interface ServicesTableProps {
   services: ServiceMetrics[]
   groups: string[]
   language: string
-  translations: {
-    services: string
-    service: string
-    group: string
-    cost: string
-    forecast: string
-    cpuMin: string
-    avgVcpu: string
-    ramGbMin: string
-    avgRam: string
-    diskGbMin: string
-    avgDisk: string
-    txGb: string
-    total: string
-    filterByService: string
-    allGroups: string
-    showDeleted: string
-    clear: string
-  }
+  t: Translations
   onTotalsChange?: (totals: FilteredTotals) => void
 }
 
@@ -40,7 +23,7 @@ export function ServicesTable({
   services,
   groups,
   language,
-  translations: t,
+  t,
   onTotalsChange
 }: ServicesTableProps) {
   const dir = useDirection()
@@ -234,31 +217,31 @@ export function ServicesTable({
               <tr className="totals-row">
                 <td colSpan={2}><strong>{t.total} ({filteredServices.length})</strong></td>
                 <td className="right money">
-                  <Tooltip content={formatRaw(filteredTotals.cost, '$')}><strong>{formatCurrency(filteredTotals.cost)}</strong></Tooltip>
+                  <Tooltip position="right" content={formatRaw(filteredTotals.cost, '$')}><strong>{formatCurrency(filteredTotals.cost)}</strong></Tooltip>
                 </td>
                 <td className="right money">
-                  <Tooltip content={formatRaw(filteredTotals.estimatedMonthly, '$')}><strong>{formatCurrency(filteredTotals.estimatedMonthly)}</strong></Tooltip>
+                  <Tooltip position="right" content={formatRaw(filteredTotals.estimatedMonthly, '$')}><strong>{formatCurrency(filteredTotals.estimatedMonthly)}</strong></Tooltip>
                 </td>
                 <td className="right">
-                  <Tooltip content={filteredTotals.cpuMinutes}><strong>{formatNumber(filteredTotals.cpuMinutes, 0)}</strong></Tooltip>
+                  <Tooltip position="right" content={filteredTotals.cpuMinutes}><strong>{formatNumber(filteredTotals.cpuMinutes, 0)}</strong></Tooltip>
                 </td>
                 <td className="right highlight">
-                  <Tooltip content={filteredTotals.avgCpu}><strong>{formatNumber(filteredTotals.avgCpu, 4)}</strong></Tooltip>
+                  <Tooltip position="right" content={filteredTotals.avgCpu}><strong>{formatNumber(filteredTotals.avgCpu, 4)}</strong></Tooltip>
                 </td>
                 <td className="right">
-                  <Tooltip content={filteredTotals.memoryGbMinutes}><strong>{formatNumber(filteredTotals.memoryGbMinutes, 0)}</strong></Tooltip>
+                  <Tooltip position="right" content={filteredTotals.memoryGbMinutes}><strong>{formatNumber(filteredTotals.memoryGbMinutes, 0)}</strong></Tooltip>
                 </td>
                 <td className="right highlight">
-                  <Tooltip content={filteredTotals.avgMemory}><strong>{formatNumber(filteredTotals.avgMemory, 4)}</strong></Tooltip>
+                  <Tooltip position="right" content={filteredTotals.avgMemory}><strong>{formatNumber(filteredTotals.avgMemory, 4)}</strong></Tooltip>
                 </td>
                 <td className="right">
-                  <Tooltip content={filteredTotals.diskGbMinutes}><strong>{formatNumber(filteredTotals.diskGbMinutes, 0)}</strong></Tooltip>
+                  <Tooltip position="right" content={filteredTotals.diskGbMinutes}><strong>{formatNumber(filteredTotals.diskGbMinutes, 0)}</strong></Tooltip>
                 </td>
                 <td className="right highlight">
-                  <Tooltip content={filteredTotals.avgDisk}><strong>{formatNumber(filteredTotals.avgDisk, 4)}</strong></Tooltip>
+                  <Tooltip position="right" content={filteredTotals.avgDisk}><strong>{formatNumber(filteredTotals.avgDisk, 4)}</strong></Tooltip>
                 </td>
                 <td className="right">
-                  <Tooltip content={filteredTotals.networkTxGb}><strong>{formatOrDash(filteredTotals.networkTxGb, 4)}</strong></Tooltip>
+                  <Tooltip position="right" content={filteredTotals.networkTxGb}><strong>{formatOrDash(filteredTotals.networkTxGb, 4)}</strong></Tooltip>
                 </td>
               </tr>
             </tfoot>

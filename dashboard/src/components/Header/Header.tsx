@@ -4,7 +4,7 @@ import { CustomSelect } from '@/components/Filters/CustomSelect'
 import { Tooltip } from '@/components/Common/Tooltip'
 import { LogoIcon, RefreshIcon, ExternalLinkIcon, BoltIcon, ClockIcon } from '@/components/Common/Icons'
 import { formatInterval } from '@/lib/formatters'
-import { LANGUAGES, LANGUAGE_CODES, type Language } from '@/i18n/keys'
+import { LANGUAGES, LANGUAGE_CODES, type Language, type Translations } from '@/i18n/keys'
 import type { ApiStatusResponse } from '@/types'
 
 interface HeaderProps {
@@ -15,12 +15,7 @@ interface HeaderProps {
   onWebSocketToggle: () => void
   onRefresh: () => void
   onShowRaw: () => void
-  translations: {
-    refresh: string
-    showRaw: string
-    wsRealtime: string
-    pollInterval: string
-  }
+  t: Translations
 }
 
 export function Header({
@@ -31,7 +26,7 @@ export function Header({
   onWebSocketToggle,
   onRefresh,
   onShowRaw,
-  translations: t
+  t
 }: HeaderProps) {
   const wsTooltip = useWebSocket
     ? t.wsRealtime
@@ -59,7 +54,7 @@ export function Header({
             )}
           </div>
           <div className="header-right">
-            <Tooltip content={t.refresh}>
+            <Tooltip content={t.refresh} position="left">
               <button
                 className="icon-btn refresh-btn"
                 onClick={onRefresh}
@@ -68,7 +63,7 @@ export function Header({
                 <RefreshIcon />
               </button>
             </Tooltip>
-            <Tooltip content={t.showRaw}>
+            <Tooltip content={t.showRaw} position="left">
               <button
                 className="icon-btn"
                 onClick={onShowRaw}
@@ -77,7 +72,7 @@ export function Header({
               </button>
             </Tooltip>
             {serverStatus?.endpoints.websocket && (
-              <Tooltip content={wsTooltip}>
+              <Tooltip content={wsTooltip} position="left">
                 <button
                   className={`toggle-btn ${useWebSocket ? 'active' : ''}`}
                   onClick={onWebSocketToggle}
