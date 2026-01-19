@@ -49,12 +49,12 @@ body {
 }
 
 .app {
-  height: 100vh;
+  min-height: 100vh;  /* At least full viewport, can grow */
   display: flex;
   flex-direction: column;
   width: 100%;
   max-width: 1400px;
-  overflow: hidden;
+  /* No overflow: hidden - allow body scroll */
 }
 
 /* Smooth language change transitions */
@@ -330,13 +330,13 @@ header h1 {
   background: #3c4043 !important;
 }
 
-/* Main content - flex container, takes all available space */
+/* Main content - flex container, sizes based on content but can grow */
 main {
-  flex: 1 1 0;  /* Grow to fill, shrink as needed, basis 0 */
+  flex: 1 1 auto;  /* Grow to fill, shrink as needed, basis auto (content) */
   padding: 16px 24px;
   display: flex;
   flex-direction: column;
-  overflow: hidden;  /* No scroll here - scroll is in table-container */
+  /* No overflow: hidden - content flows naturally, body scrolls */
   min-height: 0;
   transition: padding 0.3s ease;
 }
@@ -562,12 +562,11 @@ h3 {
 /* Services Wrapper - contains section + side Clear button */
 .services-wrapper {
   position: relative;
-  flex: 1 1 auto;  /* Grow/shrink based on content */
+  flex: 0 0 auto;  /* Size to content */
   display: flex;
   flex-direction: column;
   min-height: 0;
-  overflow: clip;  /* Clips content but doesn't create scroll context */
-  overflow-clip-margin: 25px;  /* Allow button to extend outside */
+  overflow: visible;  /* Allow button to show outside */
 }
 
 /* Side Clear button - circular, near top-right corner of white block */
@@ -623,11 +622,11 @@ h3 {
   padding: 16px 20px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.08);
   border: 1px solid #e8eaed;
-  flex: 1 1 auto;  /* Grow/shrink based on content */
+  flex: 0 0 auto;  /* Size to content */
   display: flex;
   flex-direction: column;
   min-height: 100px;
-  overflow: hidden;  /* No scroll here - only in table-container */
+  /* No overflow: hidden - content flows naturally */
   transition: padding 0.3s ease;
 }
 
@@ -874,12 +873,9 @@ h3 {
 
 /* Table container - the ONLY scrollable area for data */
 .table-container {
-  flex: 1 1 0;  /* Grow to fill remaining space in services-section */
+  flex: 0 0 auto;  /* Size to content, no grow/shrink */
   min-height: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(0,0,0,0.15) transparent;
+  overflow: visible;  /* No scroll here - body scrolls */
 }
 
 .table-container::-webkit-scrollbar {
@@ -1000,9 +996,14 @@ td.right {
   text-align: right;
   font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
   font-size: 13px;
+  font-variant-numeric: tabular-nums;  /* Fixed-width digits prevent jumping */
+  min-width: 70px;  /* Minimum column width to prevent collapse */
 }
 
-td.money { color: #34a853; }
+td.money {
+  color: #34a853;
+  min-width: 80px;  /* Money columns need more space */
+}
 td.highlight { background: #f0f7ff; font-weight: 500; color: #1a73e8; }
 
 tbody tr {
@@ -1128,7 +1129,7 @@ tfoot td {
   display: flex;
   align-items: center;
   gap: 6px;
-  min-width: 0;  /* Allow flex item to shrink */
+  min-width: 150px;  /* Prevent column collapse when filtering */
 }
 
 /* Icon wrapper - fixed size to prevent layout shift */

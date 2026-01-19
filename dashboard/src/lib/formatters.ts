@@ -111,6 +111,15 @@ export function formatNumber(value: number, decimals = 2): string {
   return value.toFixed(decimals)
 }
 
+/**
+ * Format number or show dash for zero/empty values
+ * Used for metrics where 0 means "not applicable" (e.g., disk when service has no disk)
+ */
+export function formatOrDash(value: number, decimals = 2): string {
+  if (!value || value === 0) return '—'
+  return value.toFixed(decimals)
+}
+
 export function formatInteger(value: number, locale = 'en-US'): string {
   return Math.floor(value).toLocaleString(locale)
 }

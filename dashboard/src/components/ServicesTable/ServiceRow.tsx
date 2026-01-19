@@ -2,7 +2,7 @@
 
 import { memo } from 'react'
 import { ServiceIcon } from '../common/ServiceIcon'
-import { formatCurrency, formatNumber } from '@/lib/formatters'
+import { formatCurrency, formatNumber, formatOrDash } from '@/lib/formatters'
 import type { ServiceMetrics } from '@/types'
 
 interface ServiceRowProps {
@@ -40,10 +40,10 @@ function ServiceRowComponent({ service: svc }: ServiceRowProps) {
         {formatNumber(svc.avgMemory, 4)}
       </td>
       <td className="right" title={`Raw: ${svc.diskGbMinutes}`}>
-        {formatNumber(svc.diskGbMinutes, 0)}
+        {formatOrDash(svc.diskGbMinutes, 0)}
       </td>
       <td className="right highlight" title={`Raw: ${svc.avgDisk}`}>
-        {formatNumber(svc.avgDisk, 4)}
+        {formatOrDash(svc.avgDisk, 4)}
       </td>
       <td className="right" title={`Raw: ${svc.networkTxGb}`}>
         {formatNumber(svc.networkTxGb, 4)}
