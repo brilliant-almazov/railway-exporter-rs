@@ -21,31 +21,31 @@ function ServiceRowComponent({ service: svc }: ServiceRowProps) {
       <td title={svc.isDeleted ? 'Deleted' : svc.group}>
         {svc.isDeleted ? '—' : <span className="group-badge">{svc.group}</span>}
       </td>
-      <td className="right money" title={`Raw: ${svc.cost}`}>
+      <td className="right money" title={String(svc.cost)}>
         {formatCurrency(svc.cost)}
       </td>
-      <td className="right money" title={`Raw: ${svc.estimatedMonthly}`}>
+      <td className="right money" title={String(svc.estimatedMonthly)}>
         {formatCurrency(svc.estimatedMonthly)}
       </td>
-      <td className="right" title={`Raw: ${svc.cpuMinutes}`}>
+      <td className="right" title={String(svc.cpuMinutes)}>
         {formatNumber(svc.cpuMinutes, 0)}
       </td>
-      <td className="right highlight" title={`Raw: ${svc.avgCpu}`}>
+      <td className="right highlight" title={String(svc.avgCpu)}>
         {formatNumber(svc.avgCpu, 4)}
       </td>
-      <td className="right" title={`Raw: ${svc.memoryGbMinutes}`}>
+      <td className="right" title={String(svc.memoryGbMinutes)}>
         {formatNumber(svc.memoryGbMinutes, 0)}
       </td>
-      <td className="right highlight" title={`Raw: ${svc.avgMemory}`}>
+      <td className="right highlight" title={String(svc.avgMemory)}>
         {formatNumber(svc.avgMemory, 4)}
       </td>
-      <td className="right" title={`Raw: ${svc.diskGbMinutes}`}>
+      <td className="right" title={String(svc.diskGbMinutes)}>
         {formatOrDash(svc.diskGbMinutes, 0)}
       </td>
-      <td className="right highlight" title={`Raw: ${svc.avgDisk}`}>
+      <td className="right highlight" title={String(svc.avgDisk)}>
         {formatOrDash(svc.avgDisk, 4)}
       </td>
-      <td className="right" title={`Raw: ${svc.networkTxGb}`}>
+      <td className="right" title={String(svc.networkTxGb)}>
         {formatNumber(svc.networkTxGb, 4)}
       </td>
     </tr>
