@@ -410,6 +410,7 @@ h3 {
   font-size: 28px;
   font-weight: 600;
   margin-bottom: 4px;
+  font-variant-numeric: tabular-nums;  /* Fixed-width digits prevent jumping */
   transition: font-size 0.3s ease, margin 0.3s ease;
 }
 
@@ -1415,7 +1416,7 @@ footer {
   flex-shrink: 0;
   background: #f8f9fa;
   padding: 8px 0;
-  margin-bottom: 8px;
+  margin-bottom: 16px;  /* Same as main padding-bottom for consistent spacing */
 }
 
 /* Smooth transitions on overview and all child elements */

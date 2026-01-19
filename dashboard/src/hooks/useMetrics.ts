@@ -87,8 +87,8 @@ export function useMetrics({
       }
     }
 
-    // Small delay to let hydration complete before connecting
-    const initTimeout = setTimeout(connect, 100)
+    // Longer delay to let hydration complete and prevent immediate data jump
+    const initTimeout = setTimeout(connect, 1000)
 
     return () => {
       clearTimeout(initTimeout)
