@@ -3,12 +3,14 @@
 import { StatCard } from './StatCard'
 import { formatCurrency, formatNumber, formatInteger } from '@/lib/formatters'
 import { colors } from '@/styles/colors'
+import { useDirection } from '@/hooks/useDirection'
 import type { ParsedMetrics, FilteredTotals } from '@/types'
 
 interface OverviewProps {
   metrics: ParsedMetrics
   filteredTotals: FilteredTotals
   updated?: boolean
+  isCompact?: boolean
   translations: {
     currentSpend: string
     estimatedMonthly: string
@@ -24,10 +26,14 @@ export function Overview({
   metrics,
   filteredTotals,
   updated = false,
+  isCompact = false,
   translations: t
 }: OverviewProps) {
+  const dir = useDirection()
+  const className = isCompact ? 'overview compact' : 'overview'
+
   return (
-    <section className="overview">
+    <section className={className} dir={dir}>
       <div className="stats-grid">
         <StatCard
           title={t.currentSpend}
@@ -80,9 +86,9 @@ export function Overview({
           updated={updated}
         />
         <StatCard
-          title="Network (GB)"
-          value={`↑${formatNumber(filteredTotals.networkTxGb, 2)} ↓${formatNumber(filteredTotals.networkRxGb, 2)}`}
-          subtitle="TX / RX"
+          title="Network TX (GB)"
+          value={formatNumber(filteredTotals.networkTxGb, 2)}
+          subtitle="Egress traffic"
           color={colors.network}
           updated={updated}
         />

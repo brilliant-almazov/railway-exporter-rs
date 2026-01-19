@@ -3,7 +3,7 @@
 import { CustomSelect } from '../Filters/CustomSelect'
 import { LogoIcon, RefreshIcon, ExternalLinkIcon, BoltIcon, ClockIcon } from '../common/Icons'
 import { formatInterval } from '@/lib/formatters'
-import { LANGUAGES, LANGUAGE_FLAGS, type Language } from '@/i18n/keys'
+import { LANGUAGES, LANGUAGE_CODES, type Language } from '@/i18n/keys'
 import type { ApiStatusResponse } from '@/types'
 
 interface HeaderProps {
@@ -90,9 +90,9 @@ export function Header({
                     onLanguageChange(val as Language)
                   }
                 }}
-                options={LANGUAGES.map(lang => ({
-                  value: lang,
-                  label: `${LANGUAGE_FLAGS[lang]} ${lang.toUpperCase()}`
+                options={LANGUAGE_CODES.map(code => ({
+                  value: code,
+                  label: `${LANGUAGES[code].flag} ${code.toUpperCase()}`
                 }))}
                 placeholder="🌐"
                 allowDeselect={false}
