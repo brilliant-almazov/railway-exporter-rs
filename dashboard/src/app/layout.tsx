@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
-import { QueryProvider } from '@/components/providers/QueryProvider'
-import { NuqsProvider } from '@/components/providers/NuqsProvider'
+import { QueryProvider } from '@/providers/QueryProvider'
+import { NuqsProvider } from '@/providers/NuqsProvider'
 import './globals.css'
 
 export const metadata: Metadata = {

@@ -188,51 +188,6 @@ header h1 {
   position: relative;
 }
 
-/* Custom tooltip */
-.icon-btn::before,
-.toggle-btn::before {
-  content: attr(title);
-  position: absolute;
-  bottom: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 6px 10px;
-  background: #202124;
-  color: white;
-  font-size: 12px;
-  border-radius: 4px;
-  white-space: nowrap;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.15s ease, visibility 0.15s ease;
-  pointer-events: none;
-  z-index: 1000;
-}
-
-.icon-btn::after,
-.toggle-btn::after {
-  content: '';
-  position: absolute;
-  bottom: calc(100% + 3px);
-  left: 50%;
-  transform: translateX(-50%);
-  border: 5px solid transparent;
-  border-top-color: #202124;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.15s ease, visibility 0.15s ease;
-  pointer-events: none;
-  z-index: 1000;
-}
-
-.icon-btn:hover::before,
-.icon-btn:hover::after,
-.toggle-btn:hover::before,
-.toggle-btn:hover::after {
-  opacity: 1;
-  visibility: visible;
-}
-
 .icon-btn svg {
   flex-shrink: 0;
   width: 16px;
@@ -911,11 +866,11 @@ th, td {
   white-space: nowrap;  /* Prevent wrapping, let content determine width */
 }
 
-/* Service and Group can truncate if too long */
-td:nth-child(1), td:nth-child(2) {
-  max-width: 200px;
-  overflow: hidden;
-  text-overflow: ellipsis;
+/* Service and Group columns - tighter spacing */
+td:nth-child(1),
+td:nth-child(2) {
+  padding-left: 6px;
+  padding-right: 6px;
 }
 
 thead {
@@ -990,6 +945,7 @@ th.sortable:hover {
 td {
   padding: 8px 6px;
   border-bottom: 1px solid #e8eaed;
+  vertical-align: middle;
 }
 
 td.right {
@@ -1229,6 +1185,31 @@ tfoot td {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Tippy.js custom theme */
+.tippy-box[data-theme~='custom'] {
+  background: #202124;
+  color: white;
+  font-size: 13px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  border-radius: 6px;
+  padding: 2px 4px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+  z-index: 9999;
+}
+
+.tippy-box[data-theme~='custom'] .tippy-arrow {
+  color: #202124;
+}
+
+.tippy-box[data-theme~='custom'] .tippy-content {
+  padding: 6px 10px;
+}
+
+/* Tooltip wrapper - hugs content, doesn't stretch */
+.tooltip-wrapper {
+  display: inline;
 }
 
 /* Footer - always at bottom (sticky footer pattern) */

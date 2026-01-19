@@ -1,8 +1,9 @@
 'use client'
 
 import { memo } from 'react'
-import { ServiceIcon } from '../common/ServiceIcon'
-import { formatCurrency, formatNumber, formatOrDash } from '@/lib/formatters'
+import { ServiceIcon } from '@/components/Common/ServiceIcon'
+import { Tooltip } from '@/components/Common/Tooltip'
+import { formatCurrency, formatNumber, formatOrDash, formatRaw } from '@/lib/formatters'
 import type { ServiceMetrics } from '@/types'
 
 interface ServiceRowProps {
@@ -12,41 +13,61 @@ interface ServiceRowProps {
 function ServiceRowComponent({ service: svc }: ServiceRowProps) {
   return (
     <tr className={svc.isDeleted ? 'deleted-row' : ''}>
-      <td className="service-cell" title={svc.name}>
-        <ServiceIcon url={svc.icon} name={svc.name} />
-        <span className="name">
-          {svc.isDeleted ? `${svc.name.slice(0, 8)}...` : svc.name}
-        </span>
+      <td>
+        <div className="service-cell">
+          <ServiceIcon url={svc.icon} name={svc.name} />
+          <span className="name">
+            {svc.isDeleted ? `${svc.name.slice(0, 8)}...` : svc.name}
+          </span>
+        </div>
       </td>
-      <td title={svc.isDeleted ? 'Deleted' : svc.group}>
+      <td>
         {svc.isDeleted ? '—' : <span className="group-badge">{svc.group}</span>}
       </td>
-      <td className="right money" title={String(svc.cost)}>
-        {formatCurrency(svc.cost)}
+      <td className="right money">
+        <Tooltip content={formatRaw(svc.cost, '$')}>
+          {formatCurrency(svc.cost)}
+        </Tooltip>
       </td>
-      <td className="right money" title={String(svc.estimatedMonthly)}>
-        {formatCurrency(svc.estimatedMonthly)}
+      <td className="right money">
+        <Tooltip content={formatRaw(svc.estimatedMonthly, '$')}>
+          {formatCurrency(svc.estimatedMonthly)}
+        </Tooltip>
       </td>
-      <td className="right" title={String(svc.cpuMinutes)}>
-        {formatNumber(svc.cpuMinutes, 0)}
+      <td className="right">
+        <Tooltip content={svc.cpuMinutes}>
+          {formatNumber(svc.cpuMinutes, 0)}
+        </Tooltip>
       </td>
-      <td className="right highlight" title={String(svc.avgCpu)}>
-        {formatNumber(svc.avgCpu, 4)}
+      <td className="right highlight">
+        <Tooltip content={svc.avgCpu}>
+          {formatNumber(svc.avgCpu, 4)}
+        </Tooltip>
       </td>
-      <td className="right" title={String(svc.memoryGbMinutes)}>
-        {formatNumber(svc.memoryGbMinutes, 0)}
+      <td className="right">
+        <Tooltip content={svc.memoryGbMinutes}>
+          {formatNumber(svc.memoryGbMinutes, 0)}
+        </Tooltip>
       </td>
-      <td className="right highlight" title={String(svc.avgMemory)}>
-        {formatNumber(svc.avgMemory, 4)}
+      <td className="right highlight">
+        <Tooltip content={svc.avgMemory}>
+          {formatNumber(svc.avgMemory, 4)}
+        </Tooltip>
       </td>
-      <td className="right" title={String(svc.diskGbMinutes)}>
-        {formatOrDash(svc.diskGbMinutes, 0)}
+      <td className="right">
+        <Tooltip content={svc.diskGbMinutes}>
+          {formatOrDash(svc.diskGbMinutes, 0)}
+        </Tooltip>
       </td>
-      <td className="right highlight" title={String(svc.avgDisk)}>
-        {formatOrDash(svc.avgDisk, 4)}
+      <td className="right highlight">
+        <Tooltip content={svc.avgDisk}>
+          {formatOrDash(svc.avgDisk, 4)}
+        </Tooltip>
       </td>
-      <td className="right" title={String(svc.networkTxGb)}>
-        {formatNumber(svc.networkTxGb, 4)}
+      <td className="right">
+        <Tooltip content={svc.networkTxGb}>
+          {formatOrDash(svc.networkTxGb, 4)}
+        </Tooltip>
       </td>
     </tr>
   )

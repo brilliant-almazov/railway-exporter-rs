@@ -77,22 +77,6 @@ export interface WsStatus {
   ws_clients: number
 }
 
-// Sort configuration
-export type SortField = keyof ServiceMetrics
-export type SortDirection = 'asc' | 'desc'
-
-export interface SortConfig {
-  field: SortField
-  direction: SortDirection
-}
-
-// Filter configuration
-export interface Filters {
-  group: string
-  search: string
-  showDeleted: boolean
-}
-
 // Totals for filtered services
 export interface FilteredTotals {
   cost: number

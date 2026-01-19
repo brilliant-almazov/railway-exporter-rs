@@ -1,12 +1,13 @@
 'use client'
 
 import { useMemo, useState, useCallback, useEffect } from 'react'
-import { CustomSelect } from '../Filters/CustomSelect'
-import { SortIndicator } from './SortIndicator'
-import { ServiceRow } from './ServiceRow'
+import { CustomSelect } from '@/components/Filters/CustomSelect'
+import { SortIndicator } from '@/components/ServicesTable/SortIndicator'
+import { ServiceRow } from '@/components/ServicesTable/ServiceRow'
+import { Tooltip } from '@/components/Common/Tooltip'
 import { useUrlFilters } from '@/hooks/useUrlFilters'
 import { useDirection } from '@/hooks/useDirection'
-import { formatCurrency, formatNumber } from '@/lib/formatters'
+import { formatCurrency, formatNumber, formatOrDash, formatRaw } from '@/lib/formatters'
 import type { ServiceMetrics, FilteredTotals } from '@/types'
 
 interface ServicesTableProps {
@@ -232,15 +233,33 @@ export function ServicesTable({
             <tfoot>
               <tr className="totals-row">
                 <td colSpan={2}><strong>{t.total} ({filteredServices.length})</strong></td>
-                <td className="right money" title={String(filteredTotals.cost)}><strong>{formatCurrency(filteredTotals.cost)}</strong></td>
-                <td className="right money" title={String(filteredTotals.estimatedMonthly)}><strong>{formatCurrency(filteredTotals.estimatedMonthly)}</strong></td>
-                <td className="right" title={String(filteredTotals.cpuMinutes)}><strong>{formatNumber(filteredTotals.cpuMinutes, 0)}</strong></td>
-                <td className="right highlight" title={String(filteredTotals.avgCpu)}><strong>{formatNumber(filteredTotals.avgCpu, 4)}</strong></td>
-                <td className="right" title={String(filteredTotals.memoryGbMinutes)}><strong>{formatNumber(filteredTotals.memoryGbMinutes, 0)}</strong></td>
-                <td className="right highlight" title={String(filteredTotals.avgMemory)}><strong>{formatNumber(filteredTotals.avgMemory, 4)}</strong></td>
-                <td className="right" title={String(filteredTotals.diskGbMinutes)}><strong>{formatNumber(filteredTotals.diskGbMinutes, 0)}</strong></td>
-                <td className="right highlight" title={String(filteredTotals.avgDisk)}><strong>{formatNumber(filteredTotals.avgDisk, 4)}</strong></td>
-                <td className="right" title={String(filteredTotals.networkTxGb)}><strong>{formatNumber(filteredTotals.networkTxGb, 4)}</strong></td>
+                <td className="right money">
+                  <Tooltip content={formatRaw(filteredTotals.cost, '$')}><strong>{formatCurrency(filteredTotals.cost)}</strong></Tooltip>
+                </td>
+                <td className="right money">
+                  <Tooltip content={formatRaw(filteredTotals.estimatedMonthly, '$')}><strong>{formatCurrency(filteredTotals.estimatedMonthly)}</strong></Tooltip>
+                </td>
+                <td className="right">
+                  <Tooltip content={filteredTotals.cpuMinutes}><strong>{formatNumber(filteredTotals.cpuMinutes, 0)}</strong></Tooltip>
+                </td>
+                <td className="right highlight">
+                  <Tooltip content={filteredTotals.avgCpu}><strong>{formatNumber(filteredTotals.avgCpu, 4)}</strong></Tooltip>
+                </td>
+                <td className="right">
+                  <Tooltip content={filteredTotals.memoryGbMinutes}><strong>{formatNumber(filteredTotals.memoryGbMinutes, 0)}</strong></Tooltip>
+                </td>
+                <td className="right highlight">
+                  <Tooltip content={filteredTotals.avgMemory}><strong>{formatNumber(filteredTotals.avgMemory, 4)}</strong></Tooltip>
+                </td>
+                <td className="right">
+                  <Tooltip content={filteredTotals.diskGbMinutes}><strong>{formatNumber(filteredTotals.diskGbMinutes, 0)}</strong></Tooltip>
+                </td>
+                <td className="right highlight">
+                  <Tooltip content={filteredTotals.avgDisk}><strong>{formatNumber(filteredTotals.avgDisk, 4)}</strong></Tooltip>
+                </td>
+                <td className="right">
+                  <Tooltip content={filteredTotals.networkTxGb}><strong>{formatOrDash(filteredTotals.networkTxGb, 4)}</strong></Tooltip>
+                </td>
               </tr>
             </tfoot>
           </table>

@@ -1,7 +1,8 @@
 'use client'
 
-import { CustomSelect } from '../Filters/CustomSelect'
-import { LogoIcon, RefreshIcon, ExternalLinkIcon, BoltIcon, ClockIcon } from '../common/Icons'
+import { CustomSelect } from '@/components/Filters/CustomSelect'
+import { Tooltip } from '@/components/Common/Tooltip'
+import { LogoIcon, RefreshIcon, ExternalLinkIcon, BoltIcon, ClockIcon } from '@/components/Common/Icons'
 import { formatInterval } from '@/lib/formatters'
 import { LANGUAGES, LANGUAGE_CODES, type Language } from '@/i18n/keys'
 import type { ApiStatusResponse } from '@/types'
@@ -32,6 +33,13 @@ export function Header({
   onShowRaw,
   translations: t
 }: HeaderProps) {
+  const wsTooltip = useWebSocket
+    ? t.wsRealtime
+    : t.pollInterval.replace(
+        '{interval}',
+        formatInterval(serverStatus?.config.scrape_interval_seconds || 5)
+      )
+
   return (
     <header>
       <div className="header-inner">
@@ -51,36 +59,32 @@ export function Header({
             )}
           </div>
           <div className="header-right">
-            <button
-              className="icon-btn refresh-btn"
-              onClick={onRefresh}
-              disabled={useWebSocket}
-              title={t.refresh}
-            >
-              <RefreshIcon />
-            </button>
-            <button
-              className="icon-btn"
-              onClick={onShowRaw}
-              title={t.showRaw}
-            >
-              <ExternalLinkIcon />
-            </button>
-            {serverStatus?.endpoints.websocket && (
+            <Tooltip content={t.refresh}>
               <button
-                className={`toggle-btn ${useWebSocket ? 'active' : ''}`}
-                onClick={onWebSocketToggle}
-                title={
-                  useWebSocket
-                    ? t.wsRealtime
-                    : t.pollInterval.replace(
-                        '{interval}',
-                        formatInterval(serverStatus?.config.scrape_interval_seconds || 5)
-                      )
-                }
+                className="icon-btn refresh-btn"
+                onClick={onRefresh}
+                disabled={useWebSocket}
               >
-                {useWebSocket ? <BoltIcon /> : <ClockIcon />}
+                <RefreshIcon />
               </button>
+            </Tooltip>
+            <Tooltip content={t.showRaw}>
+              <button
+                className="icon-btn"
+                onClick={onShowRaw}
+              >
+                <ExternalLinkIcon />
+              </button>
+            </Tooltip>
+            {serverStatus?.endpoints.websocket && (
+              <Tooltip content={wsTooltip}>
+                <button
+                  className={`toggle-btn ${useWebSocket ? 'active' : ''}`}
+                  onClick={onWebSocketToggle}
+                >
+                  {useWebSocket ? <BoltIcon /> : <ClockIcon />}
+                </button>
+              </Tooltip>
             )}
             <div className="lang-select">
               <CustomSelect

@@ -107,21 +107,48 @@ export function formatPercent(value: number, locale = 'en-US'): string {
   return formatByType(value, 'percent', locale)
 }
 
+/**
+ * Format number with smart "less than" display for tiny values
+ * If value > 0 but rounds to 0, shows "< 0" instead
+ */
 export function formatNumber(value: number, decimals = 2): string {
+  if (value === 0) return '0'
+
+  const threshold = Math.pow(10, -decimals)
+  if (value > 0 && value < threshold) {
+    return '< 0'
+  }
+
   return value.toFixed(decimals)
 }
 
 /**
  * Format number or show dash for zero/empty values
  * Used for metrics where 0 means "not applicable" (e.g., disk when service has no disk)
+ * Also shows "< 0" for tiny non-zero values
  */
 export function formatOrDash(value: number, decimals = 2): string {
   if (!value || value === 0) return '—'
+
+  const threshold = Math.pow(10, -decimals)
+  if (value > 0 && value < threshold) {
+    return '< 0'
+  }
+
   return value.toFixed(decimals)
 }
 
 export function formatInteger(value: number, locale = 'en-US'): string {
   return Math.floor(value).toLocaleString(locale)
+}
+
+/**
+ * Format raw value for tooltip display (high precision)
+ * Shows full precision with prefix/suffix
+ */
+export function formatRaw(value: number, prefix = '', suffix = '', precision = 6): string {
+  if (value === 0) return `${prefix}0${suffix}`
+  return `${prefix}${value.toPrecision(precision)}${suffix}`
 }
 
 // Time formatting functions

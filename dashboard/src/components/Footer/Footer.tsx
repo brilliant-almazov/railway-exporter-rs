@@ -1,5 +1,6 @@
 'use client'
 
+import { Tooltip } from '@/components/Common/Tooltip'
 import { formatUptime, formatMb, formatMs, formatBytes } from '@/lib/formatters'
 import type { ApiStatusResponse, ParsedMetrics } from '@/types'
 
@@ -16,13 +17,15 @@ export function Footer({ serverStatus, metrics, uptime, lastUpdate }: FooterProp
   const cacheEnabled = cacheConfig?.enabled ?? false
 
   // Build tooltip content for enabled cache
-  const cacheTooltip = cacheEnabled && cacheStats ? [
-    `Count: ${cacheStats.count}/${cacheConfig?.max_count ?? '?'}`,
-    `Size: ${formatBytes(cacheStats.total_bytes)}`,
-    `Avg: ${formatBytes(cacheStats.avg_bytes)}`,
-    `Min: ${formatBytes(cacheStats.min_bytes)}`,
-    `Max: ${formatBytes(cacheStats.max_bytes)}`,
-  ].join('\n') : undefined
+  const cacheTooltipContent = cacheEnabled && cacheStats ? (
+    <div style={{ textAlign: 'left', lineHeight: 1.5 }}>
+      <div>Count: {cacheStats.count}/{cacheConfig?.max_count ?? '?'}</div>
+      <div>Size: {formatBytes(cacheStats.total_bytes)}</div>
+      <div>Avg: {formatBytes(cacheStats.avg_bytes)}</div>
+      <div>Min: {formatBytes(cacheStats.min_bytes)}</div>
+      <div>Max: {formatBytes(cacheStats.max_bytes)}</div>
+    </div>
+  ) : null
 
   return (
     <footer>
@@ -37,9 +40,17 @@ export function Footer({ serverStatus, metrics, uptime, lastUpdate }: FooterProp
             </span>
           )}
           {cacheConfig && (
-            <span className="footer-server" title={cacheTooltip}>
-              • Cache: {cacheEnabled ? 'on' : 'off'}
-            </span>
+            cacheTooltipContent ? (
+              <Tooltip content={cacheTooltipContent}>
+                <span className="footer-server">
+                  • Cache: on
+                </span>
+              </Tooltip>
+            ) : (
+              <span className="footer-server">
+                • Cache: off
+              </span>
+            )
           )}
         </span>
         <span className="footer-right">

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useCallback, useEffect } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { Header } from '../Header/Header'
 import { Footer } from '../Footer/Footer'
 import { Overview } from '../Overview/Overview'
