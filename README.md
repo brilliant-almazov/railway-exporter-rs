@@ -51,7 +51,6 @@ Railway doesn't provide Prometheus metrics out of the box. This exporter fills t
 | `railway_memory_usage_gb_minutes` | Memory usage in GB-minutes |
 | `railway_disk_usage_gb_minutes` | Disk usage in GB-minutes |
 | `railway_network_tx_gb` | Network egress in GB |
-| `railway_network_rx_gb` | Network ingress in GB |
 | `railway_service_cost_usd` | Current billing period cost |
 | `railway_service_estimated_monthly_usd` | Estimated monthly cost |
 
