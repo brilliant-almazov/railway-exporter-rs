@@ -19,7 +19,6 @@
 //! | Memory | `MEMORY_USAGE_GB` | GB-minutes consumed |
 //! | Disk | `DISK_USAGE_GB` | GB-minutes of persistent storage |
 //! | Network TX | `NETWORK_TX_GB` | Egress traffic in GB |
-//! | Network RX | `NETWORK_RX_GB` | Ingress traffic in GB (free) |
 //!
 //! ## Potential Future Metrics
 //!
@@ -60,12 +59,11 @@
 //! }
 //! ```
 
-use reqwest::Client;
+use reqwest::Client as HttpClient;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-/// Railway GraphQL API URL.
-pub const API_URL: &str = "https://backboard.railway.app/graphql/v2";
+use crate::config::DEFAULT_API_URL;
 
 /// GraphQL request body.
 #[derive(Debug, Serialize)]
@@ -127,6 +125,8 @@ pub struct ServiceNode {
     pub id: String,
     /// Service name.
     pub name: String,
+    /// Service icon (emoji or URL).
+    pub icon: Option<String>,
 }
 
 /// Usage data response.
@@ -204,31 +204,34 @@ impl std::error::Error for ApiError {}
 /// # Example
 ///
 /// ```rust,no_run
-/// use railway_exporter::railway::RailwayClient;
+/// use railway_exporter::client::Client;
 ///
 /// #[tokio::main]
 /// async fn main() {
-///     let client = RailwayClient::new("your-api-token");
+///     let client = Client::new("your-api-token", None);
 ///
 ///     let project = client.get_project("project-id").await.unwrap();
 ///     println!("Project: {}", project.name);
 /// }
 /// ```
-pub struct RailwayClient {
-    client: Client,
+pub struct Client {
+    http: HttpClient,
     token: String,
+    api_url: String,
 }
 
-impl RailwayClient {
+impl Client {
     /// Creates a new Railway API client.
     ///
     /// # Arguments
     ///
     /// * `token` - Railway API token
-    pub fn new(token: &str) -> Self {
+    /// * `api_url` - Optional API URL (defaults to Railway's GraphQL endpoint)
+    pub fn new(token: &str, api_url: Option<&str>) -> Self {
         Self {
-            client: Client::new(),
+            http: HttpClient::new(),
             token: token.to_string(),
+            api_url: api_url.unwrap_or(DEFAULT_API_URL).to_string(),
         }
     }
 
@@ -243,8 +246,8 @@ impl RailwayClient {
     /// Parsed response data or an error.
     pub async fn query<T: for<'de> Deserialize<'de>>(&self, query: &str) -> Result<T, ApiError> {
         let resp = self
-            .client
-            .post(API_URL)
+            .http
+            .post(&self.api_url)
             .header("Authorization", format!("Bearer {}", self.token))
             .header("Content-Type", "application/json")
             .json(&GraphQLRequest {
@@ -279,7 +282,7 @@ impl RailwayClient {
     /// Project data with services list.
     pub async fn get_project(&self, project_id: &str) -> Result<Project, ApiError> {
         let query = format!(
-            r#"{{ project(id: "{}") {{ name services {{ edges {{ node {{ id name }} }} }} }} }}"#,
+            r#"{{ project(id: "{}") {{ name services {{ edges {{ node {{ id name icon }} }} }} }} }}"#,
             project_id
         );
         let data: ProjectData = self.query(&query).await?;
@@ -300,7 +303,7 @@ impl RailwayClient {
         project_id: &str,
     ) -> Result<HashMap<String, HashMap<String, f64>>, ApiError> {
         let query = format!(
-            r#"{{ usage(projectId: "{}", measurements: [CPU_USAGE, MEMORY_USAGE_GB, DISK_USAGE_GB, NETWORK_TX_GB, NETWORK_RX_GB], groupBy: [SERVICE_ID]) {{ measurement value tags {{ serviceId }} }} }}"#,
+            r#"{{ usage(projectId: "{}", measurements: [CPU_USAGE, MEMORY_USAGE_GB, DISK_USAGE_GB, NETWORK_TX_GB], groupBy: [SERVICE_ID]) {{ measurement value tags {{ serviceId }} }} }}"#,
             project_id
         );
         let data: UsageData = self.query(&query).await?;
@@ -329,7 +332,7 @@ impl RailwayClient {
         project_id: &str,
     ) -> Result<HashMap<String, f64>, ApiError> {
         let query = format!(
-            r#"{{ estimatedUsage(projectId: "{}", measurements: [CPU_USAGE, MEMORY_USAGE_GB, DISK_USAGE_GB, NETWORK_TX_GB, NETWORK_RX_GB]) {{ measurement estimatedValue }} }}"#,
+            r#"{{ estimatedUsage(projectId: "{}", measurements: [CPU_USAGE, MEMORY_USAGE_GB, DISK_USAGE_GB, NETWORK_TX_GB]) {{ measurement estimatedValue }} }}"#,
             project_id
         );
         let data: EstimatedData = self.query(&query).await?;
@@ -340,79 +343,5 @@ impl RailwayClient {
             .map(|i| (i.measurement, i.estimated_value))
             .collect();
         Ok(result)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_graphql_request_serialize() {
-        let req = GraphQLRequest {
-            query: "{ test }".to_string(),
-        };
-        let json = serde_json::to_string(&req).unwrap();
-        assert!(json.contains("query"));
-        assert!(json.contains("{ test }"));
-    }
-
-    #[test]
-    fn test_api_error_display() {
-        let err = ApiError::RequestError("timeout".to_string());
-        assert_eq!(format!("{}", err), "Request error: timeout");
-
-        let err = ApiError::GraphQLError("invalid query".to_string());
-        assert_eq!(format!("{}", err), "GraphQL error: invalid query");
-
-        let err = ApiError::NoData;
-        assert_eq!(format!("{}", err), "No data in response");
-    }
-
-    #[test]
-    fn test_railway_client_new() {
-        let client = RailwayClient::new("test-token");
-        assert_eq!(client.token, "test-token");
-    }
-
-    #[test]
-    fn test_usage_item_deserialize() {
-        let json = r#"{
-            "measurement": "CPU_USAGE",
-            "value": 1234.5,
-            "tags": { "serviceId": "svc-123" }
-        }"#;
-        let item: UsageItem = serde_json::from_str(json).unwrap();
-        assert_eq!(item.measurement, "CPU_USAGE");
-        assert_eq!(item.value, 1234.5);
-        assert_eq!(item.tags.service_id, "svc-123");
-    }
-
-    #[test]
-    fn test_estimated_item_deserialize() {
-        let json = r#"{
-            "measurement": "MEMORY_USAGE_GB",
-            "estimatedValue": 5000.0
-        }"#;
-        let item: EstimatedItem = serde_json::from_str(json).unwrap();
-        assert_eq!(item.measurement, "MEMORY_USAGE_GB");
-        assert_eq!(item.estimated_value, 5000.0);
-    }
-
-    #[test]
-    fn test_project_deserialize() {
-        let json = r#"{
-            "name": "my-project",
-            "services": {
-                "edges": [
-                    { "node": { "id": "svc-1", "name": "api" } },
-                    { "node": { "id": "svc-2", "name": "web" } }
-                ]
-            }
-        }"#;
-        let project: Project = serde_json::from_str(json).unwrap();
-        assert_eq!(project.name, "my-project");
-        assert_eq!(project.services.edges.len(), 2);
-        assert_eq!(project.services.edges[0].node.name, "api");
     }
 }

@@ -1,0 +1,171 @@
+'use client'
+
+import { useState, useMemo, useCallback } from 'react'
+import { Header } from '../Header/Header'
+import { Footer } from '../Footer/Footer'
+import { Overview } from '../Overview/Overview'
+import { Legend } from '../Legend/Legend'
+import { ServicesTable } from '../ServicesTable/ServicesTable'
+import { useMetrics } from '@/hooks/useMetrics'
+import { useServerStatus } from '@/hooks/useServerStatus'
+import { useLanguage } from '@/hooks/useLanguage'
+import { useCompactMode } from '@/hooks/useCompactMode'
+import { type Language } from '@/i18n/keys'
+import uiTranslations from '@/i18n/ui.json'
+import type { FilteredTotals, ServiceMetrics } from '@/types'
+import type { InitialData } from '@/lib/api.server'
+
+interface DashboardProps {
+  apiHost: string
+  initialData: InitialData
+  initialLang: Language
+}
+
+// Calculate totals from services (used for SSR initial state)
+// Must match ServicesTable calculation exactly!
+function calculateTotals(services: ServiceMetrics[]): FilteredTotals {
+  const activeServices = services.filter(s => !s.isDeleted)
+
+  return {
+    cost: activeServices.reduce((a, s) => a + s.cost, 0),
+    estimatedMonthly: activeServices.reduce((a, s) => a + s.estimatedMonthly, 0),
+    cpuMinutes: activeServices.reduce((a, s) => a + s.cpuMinutes, 0),
+    avgCpu: activeServices.reduce((a, s) => a + s.avgCpu, 0),
+    memoryGbMinutes: activeServices.reduce((a, s) => a + s.memoryGbMinutes, 0),
+    avgMemory: activeServices.reduce((a, s) => a + s.avgMemory, 0),
+    diskGbMinutes: activeServices.reduce((a, s) => a + s.diskGbMinutes, 0),
+    avgDisk: activeServices.reduce((a, s) => a + s.avgDisk, 0),
+    networkTxGb: activeServices.reduce((a, s) => a + s.networkTxGb, 0),
+    includesDeleted: false,
+  }
+}
+
+const defaultTotals: FilteredTotals = {
+  cost: 0,
+  estimatedMonthly: 0,
+  cpuMinutes: 0,
+  avgCpu: 0,
+  memoryGbMinutes: 0,
+  avgMemory: 0,
+  diskGbMinutes: 0,
+  avgDisk: 0,
+  networkTxGb: 0,
+  includesDeleted: false,
+}
+
+export function Dashboard({ apiHost, initialData, initialLang }: DashboardProps) {
+  const { language, locale, dir, setLanguage } = useLanguage(initialLang)
+  const isCompact = useCompactMode(50)
+  // Default to WebSocket enabled (server can override if ws is disabled)
+  const [useWebSocket, setUseWebSocket] = useState(
+    () => initialData.serverStatus?.endpoints.websocket ?? true
+  )
+  const [lastUpdate, setLastUpdate] = useState<Date | null>(null)
+  const [justUpdated, setJustUpdated] = useState(false)
+  // Initialize with SSR data to prevent layout shift
+  const [filteredTotals, setFilteredTotals] = useState<FilteredTotals>(
+    () => initialData.metrics ? calculateTotals(initialData.metrics.services) : defaultTotals
+  )
+
+  const { serverStatus } = useServerStatus({
+    apiHost,
+    initialData: initialData.serverStatus,
+  })
+
+  const { metrics, isLoading, error, refetch, isRefetching } = useMetrics({
+    apiHost,
+    useWebSocket,
+    pollingInterval: (serverStatus?.config.scrape_interval_seconds || 5) * 1000,
+    initialData: initialData.metrics,
+  })
+
+  // Get translations for current language
+  const t = (uiTranslations as Record<Language, typeof uiTranslations.en>)[language] || uiTranslations.en
+
+  // Get groups from server status
+  const groups = useMemo(() => {
+    if (serverStatus?.config.service_groups) {
+      return [...serverStatus.config.service_groups].sort()
+    }
+    if (!metrics) return []
+    const activeServices = metrics.services.filter(s => !s.isDeleted)
+    return [...new Set(activeServices.map(s => s.group))].sort()
+  }, [serverStatus, metrics])
+
+  // Handle refresh
+  const handleRefresh = useCallback(async () => {
+    await refetch()
+    setLastUpdate(new Date())
+    setJustUpdated(true)
+    setTimeout(() => setJustUpdated(false), 700)
+  }, [refetch])
+
+  // Handle WebSocket toggle
+  const handleWebSocketToggle = useCallback(() => {
+    setUseWebSocket(prev => !prev)
+  }, [])
+
+  // Handle show raw metrics
+  const handleShowRaw = useCallback(() => {
+    window.open(`http://${apiHost}/metrics`, '_blank')
+  }, [apiHost])
+
+  // Handle totals change from ServicesTable
+  const handleTotalsChange = useCallback((totals: FilteredTotals) => {
+    setFilteredTotals(totals)
+  }, [])
+
+  return (
+    <div className="app">
+      {isRefetching && <div className="loading-bar" />}
+      <Header
+        serverStatus={serverStatus}
+        language={language}
+        onLanguageChange={setLanguage}
+        useWebSocket={useWebSocket}
+        onWebSocketToggle={handleWebSocketToggle}
+        onRefresh={handleRefresh}
+        onShowRaw={handleShowRaw}
+        t={t}
+      />
+
+      {(error || initialData.error) && (
+        <div className="error-banner">{String(error || initialData.error)}</div>
+      )}
+      {isLoading && !initialData.metrics && (
+        <div className="loading">Loading metrics...</div>
+      )}
+
+      {metrics && (
+        <main>
+          <Overview
+            metrics={metrics}
+            filteredTotals={filteredTotals}
+            updated={justUpdated}
+            isCompact={isCompact}
+            dir={dir}
+            t={t}
+          />
+
+          <Legend language={language} dir={dir} isCompact={isCompact} />
+
+          <ServicesTable
+            services={metrics.services}
+            groups={groups}
+            language={language}
+            dir={dir}
+            onTotalsChange={handleTotalsChange}
+            t={t}
+          />
+        </main>
+      )}
+
+      <Footer
+        serverStatus={serverStatus}
+        metrics={metrics ?? null}
+        lastUpdate={lastUpdate}
+        locale={locale}
+      />
+    </div>
+  )
+}

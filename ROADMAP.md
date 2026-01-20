@@ -90,7 +90,7 @@ Retrieves **cumulative** resource consumption for the current billing period, gr
 query {
   usage(
     projectId: "PROJECT_ID"
-    measurements: [CPU_USAGE, MEMORY_USAGE_GB, DISK_USAGE_GB, NETWORK_TX_GB, NETWORK_RX_GB]
+    measurements: [CPU_USAGE, MEMORY_USAGE_GB, DISK_USAGE_GB, NETWORK_TX_GB]
     groupBy: [SERVICE_ID]
   ) {
     measurement
@@ -137,13 +137,6 @@ query {
         }
       },
       {
-        "measurement": "NETWORK_RX_GB",
-        "value": 5.67,
-        "tags": {
-          "serviceId": "srv_abc123def456"
-        }
-      },
-      {
         "measurement": "CPU_USAGE",
         "value": 4521.89,
         "tags": {
@@ -171,7 +164,8 @@ query {
 | `MEMORY_USAGE_GB` | GB-minutes | Memory × time (GB × minutes) | ✅ Yes |
 | `DISK_USAGE_GB` | GB-minutes | Disk × time (GB × minutes) | ✅ Yes |
 | `NETWORK_TX_GB` | GB | Outbound traffic (egress) | ✅ Yes |
-| `NETWORK_RX_GB` | GB | Inbound traffic (ingress) | ❌ Free |
+
+> **Note**: Ingress traffic (NETWORK_RX_GB) is free at Railway and not tracked.
 
 #### Understanding Values
 
@@ -211,7 +205,7 @@ Provides Railway's own projection for the entire billing period (not calendar mo
 query {
   estimatedUsage(
     projectId: "PROJECT_ID"
-    measurements: [CPU_USAGE, MEMORY_USAGE_GB, DISK_USAGE_GB, NETWORK_TX_GB, NETWORK_RX_GB]
+    measurements: [CPU_USAGE, MEMORY_USAGE_GB, DISK_USAGE_GB, NETWORK_TX_GB]
   ) {
     measurement
     estimatedValue
@@ -240,10 +234,6 @@ query {
       {
         "measurement": "NETWORK_TX_GB",
         "estimatedValue": 7.02
-      },
-      {
-        "measurement": "NETWORK_RX_GB",
-        "estimatedValue": 17.01
       }
     ]
   }

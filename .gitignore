@@ -1,2 +1,6 @@
 /target
 Cargo.lock
+config.yaml
+
+# IDE
+.idea/
