@@ -1,8 +1,8 @@
 //! Tests for metrics collector with mock Railway API.
 
+use crate::client::Client;
 use crate::collector::{collect_metrics, days_in_current_month};
 use crate::config::Plan;
-use crate::client::Client;
 use crate::state::AppState;
 use crate::Config;
 use http_body_util::Full;
@@ -224,10 +224,9 @@ async fn test_collect_metrics_with_service_groups() {
 
     let mut config = Config::new("test-token", "project-123", Plan::Pro, 300, 9090);
     config.api_url = api_url.clone();
-    config.service_groups.insert(
-        "backend".to_string(),
-        vec!["api".to_string()],
-    );
+    config
+        .service_groups
+        .insert("backend".to_string(), vec!["api".to_string()]);
 
     let state = Arc::new(AppState::new(config));
     let client = Client::new("test-token", Some(&api_url));
@@ -238,10 +237,18 @@ async fn test_collect_metrics_with_service_groups() {
     let metrics_json = json.as_ref().unwrap();
 
     // api service should be in "backend" group
-    let api_service = metrics_json.services.iter().find(|s| s.name == "api").unwrap();
+    let api_service = metrics_json
+        .services
+        .iter()
+        .find(|s| s.name == "api")
+        .unwrap();
     assert_eq!(api_service.group, "backend");
 
     // web service should be in "ungrouped" (default)
-    let web_service = metrics_json.services.iter().find(|s| s.name == "web").unwrap();
+    let web_service = metrics_json
+        .services
+        .iter()
+        .find(|s| s.name == "web")
+        .unwrap();
     assert_eq!(web_service.group, "ungrouped");
 }

@@ -49,9 +49,14 @@ pub async fn start(state: Arc<AppState>) {
                         if n > 0 {
                             let req_start = String::from_utf8_lossy(&peek_buf[..n]);
                             // Check if this is a GET /ws request with WebSocket upgrade
-                            let is_ws_upgrade = req_start.contains("GET /ws") && req_start.contains("Upgrade");
-                            info!("Peek: {} bytes, is_ws={}, first_line={:?}",
-                                  n, is_ws_upgrade, req_start.lines().next().unwrap_or(""));
+                            let is_ws_upgrade =
+                                req_start.contains("GET /ws") && req_start.contains("Upgrade");
+                            info!(
+                                "Peek: {} bytes, is_ws={}, first_line={:?}",
+                                n,
+                                is_ws_upgrade,
+                                req_start.lines().next().unwrap_or("")
+                            );
                             if is_ws_upgrade {
                                 info!("Routing to WebSocket handler");
                                 handle_websocket(state, stream).await;
@@ -123,8 +128,8 @@ async fn route_request(
                 handlers::not_found()
             } else {
                 // URL decode the service name
-                let decoded = urlencoding::decode(service_name)
-                    .unwrap_or_else(|_| service_name.into());
+                let decoded =
+                    urlencoding::decode(service_name).unwrap_or_else(|_| service_name.into());
                 handlers::icons(&state, &decoded).await
             }
         }
@@ -169,7 +174,10 @@ pub async fn handle_websocket(state: Arc<AppState>, stream: tokio::net::TcpStrea
     let process_info = ProcessInfoProvider::new();
 
     // Helper to build WsStatus with current process stats
-    let build_status = |state: &AppState, api_status: &crate::state::ApiStatusData, process_info: &ProcessInfoProvider| -> WsStatus {
+    let build_status = |state: &AppState,
+                        api_status: &crate::state::ApiStatusData,
+                        process_info: &ProcessInfoProvider|
+     -> WsStatus {
         let proc_status = process_info.status();
         WsStatus {
             uptime_seconds: state.start_time.elapsed().as_secs(),

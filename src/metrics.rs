@@ -100,13 +100,19 @@ impl Metrics {
 
         // Per-service metrics
         let cpu_usage = GaugeVec::new(
-            Opts::new("railway_cpu_usage_vcpu_minutes", "CPU usage in vCPU-minutes"),
+            Opts::new(
+                "railway_cpu_usage_vcpu_minutes",
+                "CPU usage in vCPU-minutes",
+            ),
             service_labels,
         )
         .unwrap();
 
         let memory_usage = GaugeVec::new(
-            Opts::new("railway_memory_usage_gb_minutes", "Memory usage in GB-minutes"),
+            Opts::new(
+                "railway_memory_usage_gb_minutes",
+                "Memory usage in GB-minutes",
+            ),
             service_labels,
         )
         .unwrap();
@@ -146,7 +152,10 @@ impl Metrics {
         .unwrap();
 
         let estimated_monthly = GaugeVec::new(
-            Opts::new("railway_estimated_monthly_usd", "Estimated monthly total in USD"),
+            Opts::new(
+                "railway_estimated_monthly_usd",
+                "Estimated monthly total in USD",
+            ),
             project_labels,
         )
         .unwrap();
@@ -191,7 +200,10 @@ impl Metrics {
         .unwrap();
 
         let api_up = GaugeVec::new(
-            Opts::new("railway_api_up", "Whether Railway API is reachable (1=up, 0=down)"),
+            Opts::new(
+                "railway_api_up",
+                "Whether Railway API is reachable (1=up, 0=down)",
+            ),
             project_labels,
         )
         .unwrap();

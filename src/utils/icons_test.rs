@@ -285,8 +285,8 @@ async fn test_get_icon_from_mock_server_with_svg() {
 
     // Decode and verify content
     let base64_part = result.strip_prefix("data:image/svg+xml;base64,").unwrap();
-    let decoded = base64::Engine::decode(&base64::engine::general_purpose::STANDARD, base64_part)
-        .unwrap();
+    let decoded =
+        base64::Engine::decode(&base64::engine::general_purpose::STANDARD, base64_part).unwrap();
     let svg_str = String::from_utf8(decoded).unwrap();
     assert!(svg_str.contains("<svg"));
     assert!(svg_str.contains("circle"));

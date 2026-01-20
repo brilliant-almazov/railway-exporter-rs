@@ -11,9 +11,9 @@ mod static_files;
 mod status;
 
 #[cfg(test)]
-mod tests;
-#[cfg(test)]
 mod static_files_test;
+#[cfg(test)]
+mod tests;
 
 pub use health::handle as health;
 pub use icons::handle as icons;

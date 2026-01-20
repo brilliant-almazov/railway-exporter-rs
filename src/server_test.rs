@@ -26,8 +26,6 @@ async fn start_test_server() -> (Arc<AppState>, String) {
 
     // Start server in background
     tokio::spawn(async move {
-        
-        
         use hyper::server::conn::http1;
         use hyper::service::service_fn;
         use hyper_util::rt::TokioIo;
@@ -101,11 +99,7 @@ async fn test_server_health_endpoint() {
     let (_state, url) = start_test_server().await;
 
     let client = reqwest::Client::new();
-    let resp = client
-        .get(format!("{}/health", url))
-        .send()
-        .await
-        .unwrap();
+    let resp = client.get(format!("{}/health", url)).send().await.unwrap();
 
     assert_eq!(resp.status(), 200);
     assert_eq!(resp.text().await.unwrap(), "ok");
@@ -116,11 +110,7 @@ async fn test_server_status_endpoint() {
     let (_state, url) = start_test_server().await;
 
     let client = reqwest::Client::new();
-    let resp = client
-        .get(format!("{}/status", url))
-        .send()
-        .await
-        .unwrap();
+    let resp = client.get(format!("{}/status", url)).send().await.unwrap();
 
     assert_eq!(resp.status(), 200);
 
@@ -151,11 +141,7 @@ async fn test_server_metrics_prometheus() {
     let (_state, url) = start_test_server().await;
 
     let client = reqwest::Client::new();
-    let resp = client
-        .get(format!("{}/metrics", url))
-        .send()
-        .await
-        .unwrap();
+    let resp = client.get(format!("{}/metrics", url)).send().await.unwrap();
 
     assert_eq!(resp.status(), 200);
 
@@ -235,11 +221,7 @@ async fn test_server_cors_headers() {
     let (_state, url) = start_test_server().await;
 
     let client = reqwest::Client::new();
-    let resp = client
-        .get(format!("{}/health", url))
-        .send()
-        .await
-        .unwrap();
+    let resp = client.get(format!("{}/health", url)).send().await.unwrap();
 
     assert!(resp.headers().get("Access-Control-Allow-Origin").is_some());
 }
@@ -370,8 +352,8 @@ async fn start_ws_test_server() -> (Arc<AppState>, String) {
 
 #[tokio::test]
 async fn test_websocket_connection() {
-    use tokio_tungstenite::connect_async;
     use futures_util::StreamExt;
+    use tokio_tungstenite::connect_async;
 
     let (state, url) = start_ws_test_server().await;
 
@@ -447,9 +429,9 @@ async fn test_websocket_client_count() {
 
 #[tokio::test]
 async fn test_websocket_ping_pong() {
+    use futures_util::{SinkExt, StreamExt};
     use tokio_tungstenite::connect_async;
     use tokio_tungstenite::tungstenite::Message;
-    use futures_util::{SinkExt, StreamExt};
 
     let (_state, url) = start_ws_test_server().await;
     let ws_url = format!("{}/ws", url);
@@ -461,7 +443,10 @@ async fn test_websocket_ping_pong() {
     let _ = ws_stream.next().await;
 
     // Send ping
-    ws_stream.send(Message::Ping(vec![1, 2, 3].into())).await.unwrap();
+    ws_stream
+        .send(Message::Ping(vec![1, 2, 3].into()))
+        .await
+        .unwrap();
 
     // Should receive pong with same data
     // Note: The pong might come interleaved with status updates
@@ -483,8 +468,8 @@ async fn test_websocket_ping_pong() {
 
 #[tokio::test]
 async fn test_websocket_broadcast() {
-    use tokio_tungstenite::connect_async;
     use futures_util::StreamExt;
+    use tokio_tungstenite::connect_async;
 
     let (state, url) = start_ws_test_server().await;
     let ws_url = format!("{}/ws", url);
@@ -496,7 +481,9 @@ async fn test_websocket_broadcast() {
     // Might not have metrics yet, so don't wait for second message
 
     // Broadcast a message
-    let _ = state.ws_broadcast.send(r#"{"type":"test","data":"hello"}"#.to_string());
+    let _ = state
+        .ws_broadcast
+        .send(r#"{"type":"test","data":"hello"}"#.to_string());
 
     // Should receive the broadcast
     let timeout = tokio::time::timeout(Duration::from_secs(2), async {

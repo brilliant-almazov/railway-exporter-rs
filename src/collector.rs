@@ -11,10 +11,7 @@ use std::time::Instant;
 use tracing::{debug, info};
 
 /// Collects metrics from Railway API and updates Prometheus gauges.
-pub async fn collect_metrics(
-    client: &Client,
-    state: &Arc<AppState>,
-) -> Result<(), ApiError> {
+pub async fn collect_metrics(client: &Client, state: &Arc<AppState>) -> Result<(), ApiError> {
     let start = Instant::now();
     let config = &state.config;
     let metrics = &state.metrics;
@@ -72,7 +69,11 @@ pub async fn collect_metrics(
         .collect();
 
     // Second pass: process icons based on mode
-    debug!("Processing icons for {} services (mode: {})", services_raw.len(), config.icon_cache.mode);
+    debug!(
+        "Processing icons for {} services (mode: {})",
+        services_raw.len(),
+        config.icon_cache.mode
+    );
     let mut services: HashMap<String, (String, String, String)> = HashMap::new();
     for (id, name, icon_url, group) in services_raw {
         let icon_data = if !config.icon_cache.enabled {

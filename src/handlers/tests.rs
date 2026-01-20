@@ -1,6 +1,8 @@
 //! Handler tests for Railway Exporter.
 
-use super::{finalize, health, metrics_json, metrics_prometheus, not_found, status, HandlerResponse};
+use super::{
+    finalize, health, metrics_json, metrics_prometheus, not_found, status, HandlerResponse,
+};
 use crate::config::{Config, GzipConfig, Plan};
 use crate::state::AppState;
 use hyper::body::Bytes;
@@ -69,7 +71,10 @@ fn test_finalize_without_cors() {
 
     let result = finalize(response, false, false, &gzip);
 
-    assert!(result.headers().get("Access-Control-Allow-Origin").is_none());
+    assert!(result
+        .headers()
+        .get("Access-Control-Allow-Origin")
+        .is_none());
 }
 
 #[test]
@@ -250,7 +255,10 @@ async fn test_status_handler_config() {
     let parsed: serde_json::Value = serde_json::from_slice(&body).unwrap();
     assert_eq!(parsed["config"]["plan"], "hobby");
     assert_eq!(parsed["config"]["scrape_interval_seconds"], 60);
-    assert_eq!(parsed["config"]["api_url"], "https://backboard.railway.app/graphql/v2");
+    assert_eq!(
+        parsed["config"]["api_url"],
+        "https://backboard.railway.app/graphql/v2"
+    );
 }
 
 #[tokio::test]

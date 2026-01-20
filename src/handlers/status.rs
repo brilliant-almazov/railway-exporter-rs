@@ -47,9 +47,13 @@ pub async fn handle(state: &AppState) -> HandlerResponse {
         IconMode::Link => IconCacheStatusConfig {
             enabled: ic.enabled,
             mode: ic.mode,
-            max_count: Some(ic.max_count),  // Always show for "Icons: X/Y"
+            max_count: Some(ic.max_count), // Always show for "Icons: X/Y"
             max_age: Some(ic.max_age),
-            base_url: if ic.base_url.is_empty() { None } else { Some(ic.base_url.clone()) },
+            base_url: if ic.base_url.is_empty() {
+                None
+            } else {
+                Some(ic.base_url.clone())
+            },
         },
     };
 

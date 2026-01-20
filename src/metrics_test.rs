@@ -117,12 +117,27 @@ fn test_all_project_metrics() {
 
     // Set all per-project metrics
     metrics.current_usage.with_label_values(labels).set(25.00);
-    metrics.estimated_monthly.with_label_values(labels).set(75.00);
+    metrics
+        .estimated_monthly
+        .with_label_values(labels)
+        .set(75.00);
     metrics.daily_average.with_label_values(labels).set(2.50);
-    metrics.days_in_billing_period.with_label_values(labels).set(10.0);
-    metrics.days_remaining_in_month.with_label_values(labels).set(20.0);
-    metrics.last_scrape_timestamp.with_label_values(labels).set(1700000000.0);
-    metrics.scrape_duration_seconds.with_label_values(labels).set(0.15);
+    metrics
+        .days_in_billing_period
+        .with_label_values(labels)
+        .set(10.0);
+    metrics
+        .days_remaining_in_month
+        .with_label_values(labels)
+        .set(20.0);
+    metrics
+        .last_scrape_timestamp
+        .with_label_values(labels)
+        .set(1700000000.0);
+    metrics
+        .scrape_duration_seconds
+        .with_label_values(labels)
+        .set(0.15);
     metrics.api_up.with_label_values(labels).set(1.0);
 
     let output = metrics.encode();

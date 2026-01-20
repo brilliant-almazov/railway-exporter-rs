@@ -458,7 +458,11 @@ impl Config {
         let pricing_values = yaml_config
             .pricing
             .as_ref()
-            .and_then(|entries| entries.iter().find(|e| e.name.to_lowercase() == plan.as_str()))
+            .and_then(|entries| {
+                entries
+                    .iter()
+                    .find(|e| e.name.to_lowercase() == plan.as_str())
+            })
             .map(|e| e.price.clone())
             .unwrap_or_default();
 

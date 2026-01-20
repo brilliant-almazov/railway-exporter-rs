@@ -292,7 +292,8 @@ async fn test_sends_auth_header() {
         *received_token_clone.lock().unwrap() = token;
 
         async {
-            let response = r#"{ "data": { "project": { "name": "test", "services": { "edges": [] } } } }"#;
+            let response =
+                r#"{ "data": { "project": { "name": "test", "services": { "edges": [] } } } }"#;
             Response::builder()
                 .header("content-type", "application/json")
                 .body(Full::new(Bytes::from(response)))
@@ -328,7 +329,8 @@ async fn test_sends_content_type_json() {
         *received_content_type_clone.lock().unwrap() = ct;
 
         async {
-            let response = r#"{ "data": { "project": { "name": "test", "services": { "edges": [] } } } }"#;
+            let response =
+                r#"{ "data": { "project": { "name": "test", "services": { "edges": [] } } } }"#;
             Response::builder()
                 .header("content-type", "application/json")
                 .body(Full::new(Bytes::from(response)))

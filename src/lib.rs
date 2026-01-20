@@ -19,12 +19,12 @@
 //! - `collector` - Metrics collection logic
 //! - `server` - HTTP server and handlers
 
+pub mod client;
 pub mod collector;
 pub mod config;
 pub mod handlers;
 pub mod metrics;
 pub mod pricing;
-pub mod client;
 pub mod server;
 pub mod state;
 pub mod types;

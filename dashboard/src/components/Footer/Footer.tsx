@@ -20,6 +20,8 @@ export function Footer({ serverStatus, metrics, lastUpdate, locale }: FooterProp
 
   useEffect(() => {
     if (lastUpdate) {
+      // This is intentional - locale-dependent formatting must happen client-side
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setUiTime(lastUpdate.toLocaleTimeString(locale))
     }
   }, [lastUpdate, locale])

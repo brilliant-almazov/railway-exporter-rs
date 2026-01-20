@@ -214,9 +214,7 @@ fn test_server_status_serialize() {
                 cpu: Some(0.000231),
                 memory: Some(0.000116),
                 disk: Some(0.000021),
-                network: Some(NetworkPricing {
-                    tx: Some(0.10),
-                }),
+                network: Some(NetworkPricing { tx: Some(0.10) }),
             },
             gzip: crate::config::GzipConfig::default(),
             icon_cache: IconCacheStatusConfig {
@@ -251,7 +249,10 @@ fn test_server_status_serialize() {
     assert_eq!(parsed["endpoints"]["websocket"], true);
     assert_eq!(parsed["config"]["plan"], "pro");
     assert_eq!(parsed["config"]["scrape_interval_seconds"], 300);
-    assert_eq!(parsed["config"]["service_groups"].as_array().unwrap().len(), 2);
+    assert_eq!(
+        parsed["config"]["service_groups"].as_array().unwrap().len(),
+        2
+    );
     assert_eq!(parsed["config"]["gzip"]["enabled"], true);
     assert_eq!(parsed["config"]["gzip"]["min_size"], 256);
     assert_eq!(parsed["config"]["gzip"]["level"], 1);

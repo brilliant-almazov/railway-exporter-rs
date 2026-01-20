@@ -12,8 +12,8 @@
 //! | Disk | $0.000021/GB-min | $0.000021/GB-min |
 //! | Egress | $0.10/GB | $0.10/GB |
 
-use std::collections::HashMap;
 use serde::Serialize;
+use std::collections::HashMap;
 
 /// Default pricing for Hobby plan (per unit).
 pub const HOBBY_PRICES: &[(&str, f64)] = &[

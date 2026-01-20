@@ -217,7 +217,9 @@ impl IconCache {
         let max_bytes = *sizes.last().unwrap_or(&0);
         let avg_bytes = total_bytes / count;
 
-        // Median
+        // Median (using % instead of is_multiple_of() which is unstable)
+        #[allow(unknown_lints)]
+        #[allow(clippy::manual_is_multiple_of)]
         let median_bytes = if count % 2 == 0 {
             (sizes[count / 2 - 1] + sizes[count / 2]) / 2
         } else {

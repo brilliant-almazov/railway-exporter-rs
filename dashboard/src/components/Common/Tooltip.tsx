@@ -20,7 +20,8 @@ export function Tooltip({
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    // eslint-disable-next-line react-compiler/react-compiler
+    // This is intentional - we need to detect client-side rendering to avoid hydration mismatch
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true)
   }, [])
 

@@ -11,24 +11,42 @@ use std::path::Path;
 
 #[test]
 fn test_mime_type_html() {
-    assert_eq!(get_mime_type(Path::new("index.html")), "text/html; charset=utf-8");
-    assert_eq!(get_mime_type(Path::new("page.htm")), "text/html; charset=utf-8");
+    assert_eq!(
+        get_mime_type(Path::new("index.html")),
+        "text/html; charset=utf-8"
+    );
+    assert_eq!(
+        get_mime_type(Path::new("page.htm")),
+        "text/html; charset=utf-8"
+    );
 }
 
 #[test]
 fn test_mime_type_css() {
-    assert_eq!(get_mime_type(Path::new("styles.css")), "text/css; charset=utf-8");
+    assert_eq!(
+        get_mime_type(Path::new("styles.css")),
+        "text/css; charset=utf-8"
+    );
 }
 
 #[test]
 fn test_mime_type_javascript() {
-    assert_eq!(get_mime_type(Path::new("app.js")), "application/javascript; charset=utf-8");
-    assert_eq!(get_mime_type(Path::new("module.mjs")), "application/javascript; charset=utf-8");
+    assert_eq!(
+        get_mime_type(Path::new("app.js")),
+        "application/javascript; charset=utf-8"
+    );
+    assert_eq!(
+        get_mime_type(Path::new("module.mjs")),
+        "application/javascript; charset=utf-8"
+    );
 }
 
 #[test]
 fn test_mime_type_json() {
-    assert_eq!(get_mime_type(Path::new("data.json")), "application/json; charset=utf-8");
+    assert_eq!(
+        get_mime_type(Path::new("data.json")),
+        "application/json; charset=utf-8"
+    );
     assert_eq!(get_mime_type(Path::new("app.js.map")), "application/json");
 }
 
@@ -52,14 +70,26 @@ fn test_mime_type_fonts() {
 
 #[test]
 fn test_mime_type_text() {
-    assert_eq!(get_mime_type(Path::new("readme.txt")), "text/plain; charset=utf-8");
-    assert_eq!(get_mime_type(Path::new("config.xml")), "application/xml; charset=utf-8");
+    assert_eq!(
+        get_mime_type(Path::new("readme.txt")),
+        "text/plain; charset=utf-8"
+    );
+    assert_eq!(
+        get_mime_type(Path::new("config.xml")),
+        "application/xml; charset=utf-8"
+    );
 }
 
 #[test]
 fn test_mime_type_unknown() {
-    assert_eq!(get_mime_type(Path::new("file.unknown")), "application/octet-stream");
-    assert_eq!(get_mime_type(Path::new("noext")), "application/octet-stream");
+    assert_eq!(
+        get_mime_type(Path::new("file.unknown")),
+        "application/octet-stream"
+    );
+    assert_eq!(
+        get_mime_type(Path::new("noext")),
+        "application/octet-stream"
+    );
 }
 
 // =============================================================================
@@ -89,7 +119,7 @@ fn test_handle_blocks_double_dot_anywhere() {
     let paths = [
         "../secret",
         "foo/../bar",
-        "..%2f..%2fetc/passwd",  // URL-encoded but contains literal ".."
+        "..%2f..%2fetc/passwd", // URL-encoded but contains literal ".."
         "/path/to/../../../etc",
     ];
 
