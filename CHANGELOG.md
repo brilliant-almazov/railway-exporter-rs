@@ -176,7 +176,7 @@ for Railway.app billing and usage metrics, written in Rust.
 - Service grouping and filtering
 
 ![Dashboard EN](docs/images/dashboard-en-v2.png)
-![Dashboard RU](docs/images/dashboard-ru-v2.png)
+![Dashboard UK](docs/images/dashboard-uk-filtered.png)
 ![Dashboard ZH](docs/images/dashboard-zh.png)
 ![Dashboard HE](docs/images/dashboard-he-v2.png)
 
