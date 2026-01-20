@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { formatMb, formatMs } from '@/lib/formatters'
 import { CacheInfo } from './CacheInfo'
 import { UptimeDisplay } from '@/components/Common/UptimeDisplay'
@@ -14,6 +15,14 @@ interface FooterProps {
 }
 
 export function Footer({ serverStatus, metrics, lastUpdate, locale }: FooterProps) {
+  // Client-only rendering for lastUpdate to avoid hydration mismatch
+  const [uiTime, setUiTime] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (lastUpdate) {
+      setUiTime(lastUpdate.toLocaleTimeString(locale))
+    }
+  }, [lastUpdate, locale])
 
   return (
     <footer>
@@ -31,7 +40,7 @@ export function Footer({ serverStatus, metrics, lastUpdate, locale }: FooterProp
         </span>
         <span className="footer-right">
           {serverStatus && (
-            <span className="footer-api">
+            <span className="footer-api" style={{ minWidth: '10em', display: 'inline-block' }}>
               Railway:{' '}
               {serverStatus.api.last_success
                 ? <TimeDisplay timestamp={serverStatus.api.last_success} locale={locale} />
@@ -50,9 +59,9 @@ export function Footer({ serverStatus, metrics, lastUpdate, locale }: FooterProp
               )}
             </span>
           )}
-          {lastUpdate && (
+          {uiTime && (
             <span className="footer-update">
-              • UI: {lastUpdate.toLocaleTimeString(locale)}
+              • UI: {uiTime}
             </span>
           )}
         </span>

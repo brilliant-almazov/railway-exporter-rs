@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState, useCallback, useEffect } from 'react'
+import { useMemo, useState, useCallback, useEffect, useRef } from 'react'
 import { CustomSelect } from '@/components/Filters/CustomSelect'
 import { SortIndicator } from '@/components/ServicesTable/SortIndicator'
 import { ServiceRow } from '@/components/ServicesTable/ServiceRow'
@@ -96,8 +96,15 @@ export function ServicesTable({
     includesDeleted: showDeleted && filteredServices.some(s => s.isDeleted),
   }), [filteredServices, showDeleted])
 
+  // Skip first effect to prevent hydration jump (SSR totals may differ from client URL state)
+  const isFirstRender = useRef(true)
+
   // Notify parent of totals change (in effect to avoid setState during render)
   useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      return
+    }
     onTotalsChange?.(filteredTotals)
   }, [filteredTotals, onTotalsChange])
 

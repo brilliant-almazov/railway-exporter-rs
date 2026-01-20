@@ -68,13 +68,16 @@ export const FORMAT_CONFIG = {
 
 type FormatKey = keyof typeof FORMAT_CONFIG
 
-// Format a number according to config
-export function formatByType(value: number, type: FormatKey, locale = 'en-US'): string {
+// Format a number according to config (deterministic, no locale-dependent formatting)
+// Uses toFixed for consistent SSR/client output to prevent hydration mismatch
+export function formatByType(value: number, type: FormatKey, _locale = 'en-US'): string {
   const config = FORMAT_CONFIG[type]
-  const formatted = value.toLocaleString(locale, {
-    minimumFractionDigits: config.decimals,
-    maximumFractionDigits: config.decimals,
-  })
+  // Use toFixed for deterministic output (toLocaleString varies between server/client)
+  const fixed = value.toFixed(config.decimals)
+  // Add thousand separators manually for readability
+  const [intPart, decPart] = fixed.split('.')
+  const withSeparators = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+  const formatted = decPart ? `${withSeparators}.${decPart}` : withSeparators
   return `${config.prefix}${formatted}${config.suffix}`
 }
 
@@ -138,8 +141,9 @@ export function formatOrDash(value: number, decimals = 2): string {
   return value.toFixed(decimals)
 }
 
-export function formatInteger(value: number, locale = 'en-US'): string {
-  return Math.floor(value).toLocaleString(locale)
+export function formatInteger(value: number, _locale = 'en-US'): string {
+  // Use regex for thousand separators (deterministic, no locale variance)
+  return Math.floor(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 }
 
 /**

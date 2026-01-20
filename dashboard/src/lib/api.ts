@@ -28,7 +28,7 @@ export function mapApiToMetrics(api: ApiMetricsJson): ParsedMetrics {
 
   return {
     project: api.project.name,
-    plan: 'Pro', // TODO: add to backend response
+    // plan comes from /status endpoint (serverStatus.config.plan), not metrics
     daysInPeriod,
     daysRemaining: api.project.days_remaining,
     currentUsage: api.project.current_usage_usd,

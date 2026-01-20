@@ -1,30 +1,25 @@
-'use client'
-
-import { useEffect, useState } from 'react'
-
 interface TimeDisplayProps {
   /** Unix timestamp in seconds (not milliseconds) */
   timestamp: number
-  locale: string
-  placeholder?: string
+  locale?: string
 }
 
 /**
- * Client-only time display component.
- * Shows placeholder on initial render to avoid hydration mismatch,
- * then displays formatted time after hydration.
- *
- * This avoids the Node.js vs Browser toLocaleTimeString() differences.
+ * Deterministic time formatting for SSR/client consistency.
+ * Uses fixed format HH:MM:SS to avoid hydration mismatch.
  */
-export function TimeDisplay({ timestamp, locale, placeholder = '—' }: TimeDisplayProps) {
-  const [time, setTime] = useState<string | null>(null)
+function formatTime(timestamp: number): string {
+  const date = new Date(timestamp * 1000)
+  const h = date.getHours().toString().padStart(2, '0')
+  const m = date.getMinutes().toString().padStart(2, '0')
+  const s = date.getSeconds().toString().padStart(2, '0')
+  return `${h}:${m}:${s}`
+}
 
-  useEffect(() => {
-    // Format time only on client after hydration
-    const date = new Date(timestamp * 1000)
-    setTime(date.toLocaleTimeString(locale))
-  }, [timestamp, locale])
-
-  // Return placeholder during SSR and first client render
-  return <>{time ?? placeholder}</>
+/**
+ * Time display component with deterministic formatting.
+ * Renders immediately on both SSR and client with same output.
+ */
+export function TimeDisplay({ timestamp }: TimeDisplayProps) {
+  return <span>{formatTime(timestamp)}</span>
 }

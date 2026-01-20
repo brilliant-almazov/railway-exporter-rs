@@ -347,7 +347,7 @@ h3 {
 }
 
 .stats-grid-secondary {
-  margin-top: 12px;
+  margin-top: 8px;  /* Reduced from 12px */
 }
 
 .stats-grid-secondary .stat-card {
@@ -528,10 +528,11 @@ h3 {
 /* Services Wrapper - contains section + side Clear button */
 .services-wrapper {
   position: relative;
-  flex: 1 1 0;  /* Grow to fill available space */
+  flex: 0 1 auto;  /* Don't grow beyond content, can shrink */
   display: flex;
   flex-direction: column;
   min-height: 0;
+  max-height: 100%;  /* Don't exceed parent */
   overflow: visible;  /* Allow button to show outside */
 }
 
@@ -585,13 +586,14 @@ h3 {
 .services-section {
   background: white;
   border-radius: 8px;
-  padding: 16px;  /* Equal padding all sides */
+  padding: 12px;  /* Equal padding on all sides */
   box-shadow: 0 1px 3px rgba(0,0,0,0.08);
   border: 1px solid #e8eaed;
-  flex: 1 1 0;  /* Grow to fill available space */
+  flex: 0 1 auto;  /* Don't grow beyond content, can shrink */
   display: flex;
   flex-direction: column;
   min-height: 0;  /* Allow shrinking */
+  max-height: 100%;  /* Don't exceed parent */
   overflow: hidden;  /* Contains overflow */
   transition: padding 0.3s ease;
   margin-bottom: 0;  /* Override section margin - last element before footer */
@@ -602,7 +604,7 @@ h3 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 6px;  /* Small gap between filters and table */
   flex-wrap: wrap;
   gap: 12px;
   position: relative;
@@ -848,7 +850,7 @@ h3 {
 
 /* Table container */
 .table-container {
-  flex: 1 1 0;  /* Grow to fill available space */
+  flex: 0 1 auto;  /* Don't grow beyond content, can shrink */
   min-height: 0;
   overflow-y: auto;  /* Enable vertical scroll */
   overflow-x: hidden;
@@ -1416,7 +1418,7 @@ footer {
   flex-shrink: 0;
   background: #f8f9fa;
   padding: 8px 0;
-  margin-bottom: 16px;  /* Same as main padding-bottom for consistent spacing */
+  margin-bottom: 8px;  /* Reduced from 16px for tighter layout */
 }
 
 /* Smooth transitions on overview and all child elements */

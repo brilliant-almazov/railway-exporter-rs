@@ -16,9 +16,9 @@ export interface ServiceMetrics {
 }
 
 // Parsed metrics from API
+// Note: plan comes from /status endpoint (ApiStatusResponse.config.plan), not metrics
 export interface ParsedMetrics {
   project: string
-  plan: string
   currentUsage: number
   estimatedMonthly: number
   dailyAverage: number

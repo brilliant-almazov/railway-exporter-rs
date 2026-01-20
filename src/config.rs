@@ -1,4 +1,4 @@
-//! Configuration management for Railway Exporter.
+//! uration management for Railway Exporter.
 //!
 //! Configuration is loaded from YAML:
 //! 1. Base64-encoded YAML in `CONFIG_BASE64` env var (for Docker/Railway)
