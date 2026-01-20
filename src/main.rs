@@ -18,29 +18,15 @@
 static GLOBAL: tikv_jemallocator::Jemalloc = tikv_jemallocator::Jemalloc;
 
 /// Configure jemalloc for aggressive memory release on Linux.
+/// Note: decay settings configured via MALLOC_CONF at build time (background_threads:true)
 #[cfg(all(target_os = "linux", not(target_env = "msvc")))]
 fn configure_allocator() {
-    use tikv_jemalloc_ctl::{arenas, epoch, opt};
+    use tikv_jemalloc_ctl::epoch;
 
     // Advance epoch to get fresh stats
     epoch::advance().ok();
 
-    // Log jemalloc version
-    if let Ok(version) = opt::version::read() {
-        tracing::info!("jemalloc version: {}", version);
-    }
-
-    // Set aggressive memory release: return memory to OS immediately
-    // dirty_decay_ms: time before dirty pages are released (0 = immediate)
-    // muzzy_decay_ms: time before muzzy pages are released (0 = immediate)
-    if let Err(e) = arenas::dirty_decay_ms::write(0) {
-        tracing::warn!("Failed to set dirty_decay_ms: {}", e);
-    }
-    if let Err(e) = arenas::muzzy_decay_ms::write(0) {
-        tracing::warn!("Failed to set muzzy_decay_ms: {}", e);
-    }
-
-    tracing::info!("jemalloc configured with aggressive memory release");
+    tracing::info!("jemalloc configured (background_threads enabled)");
 }
 
 /// No-op allocator configuration for non-Linux platforms.

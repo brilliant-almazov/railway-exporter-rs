@@ -88,7 +88,7 @@ pub async fn collect_metrics(
                     // Ensure icon is cached, return full URL to our endpoint
                     if !icon_url.is_empty() && !icon_url.starts_with("data:") {
                         state.icon_cache.ensure_cached(&name, &icon_url).await;
-                        let path = format!("/static/icons/services/{}", urlencoding::encode(&name));
+                        let path = format!("/icons/services/{}", urlencoding::encode(&name));
                         if config.icon_cache.base_url.is_empty() {
                             path
                         } else {

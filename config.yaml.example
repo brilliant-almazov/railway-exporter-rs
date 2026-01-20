@@ -1,24 +1,59 @@
-# Railway Exporter Configuration
-# Copy this file to config.yaml and fill in your values
+# =============================================================================
+# Railway Exporter - Example Configuration
+# =============================================================================
+# Copy this file to config.yaml and fill in your values:
+#   cp config.yaml.example config.yaml
+#
+# Required fields marked with [REQUIRED]
+# =============================================================================
 
-# Railway API credentials (required)
-railway_api_url: https://backboard.railway.app/graphql/v2
-railway_project_id: your-project-id
-railway_api_token: your-api-token
+# [REQUIRED] Railway API Token
+# Get it from: https://railway.app/account/tokens
+# Keep this secret! Never commit to version control.
+railway_api_token: "your-api-token-here"
 
-project_name: string
+# [REQUIRED] Railway Project ID
+# Find it in: Project Settings → General → Project ID
+# Or from URL: https://railway.app/project/{PROJECT_ID}
+railway_project_id: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 
-# Plan: hobby or pro
+# [REQUIRED] Display name for the project
+# Shown in /status endpoint and dashboard
+project_name: "My Railway Project"
+
+# [REQUIRED] Your Railway pricing plan
+# Values: "hobby" or "pro"
+# Affects cost calculations - using wrong plan = wrong costs!
 railway_plan: pro
 
-# Scrape interval in seconds
-scrape_interval: 300
+# =============================================================================
+# Server Settings (optional, defaults shown)
+# =============================================================================
 
-# Server port
+# HTTP server port
 port: 9090
 
-# Service groups for organizing services
-# Map group names to lists of service name patterns
+# Interval between Railway API scrapes in seconds
+# Valid range: 60-3600
+# Lower = fresher data but more API calls
+scrape_interval: 300
+
+# Railway GraphQL API URL (don't change unless Railway updates it)
+railway_api_url: https://backboard.railway.app/graphql/v2
+
+# Enable CORS headers for cross-origin requests
+cors_enabled: true
+
+# Enable WebSocket endpoint /ws for real-time updates
+websocket_enabled: true
+
+# =============================================================================
+# Service Groups (optional)
+# =============================================================================
+# Organize services into groups for dashboard filtering
+# Pattern matching: case-insensitive substring match
+# Example: "postgres" matches "postgres", "PostgreSQL", "my-postgres-db"
+
 service_groups:
   monitoring:
     - prometheus
@@ -27,42 +62,52 @@ service_groups:
   database:
     - postgres
     - redis
+    - mysql
   messaging:
     - rabbitmq
+    - kafka
   network:
     - tailscale
+    - nginx
 
-cors_enabled: true
-websocket_enabled: true
+# =============================================================================
+# Gzip Compression (optional, defaults shown)
+# =============================================================================
 
-# Gzip compression settings
 gzip:
-  enabled: true      # Enable gzip compression for HTTP responses
-  min_size: 256      # Minimum response size in bytes to compress
-  level: 5           # Compression level: 1 (fast) to 9 (best)
+  enabled: true      # Enable gzip compression
+  min_size: 256      # Min response size in bytes to compress
+  level: 1           # 1=fast, 9=best compression
 
-# Icon cache settings (LRU cache, stores raw bytes)
+# =============================================================================
+# Icon Cache (optional, defaults shown)
+# =============================================================================
+
 icon_cache:
   enabled: true      # Enable icon caching
   max_count: 200     # Max icons to cache (LRU eviction)
-  # TODO: not implemented yet
-  # max_bytes: 0     # Max cache size in bytes (0 = unlimited)
-  # ttl_seconds: 0   # Icon TTL (0 = no expiry)
+  mode: base64       # "base64" = embed in JSON, "link" = serve from endpoint
+  max_age: 86400     # Browser cache TTL for mode: link (1 day)
+  base_url: ""       # Required if mode: link, e.g. "https://exporter.example.com"
 
-pricing:
-  - name: hobby
-    price:
-      cpu: float
-      memory: float
-      disk: float
-      network:
-        tx: float
-        rx: float
-  - name: pro
-    price:
-      cpu: float
-      memory: float
-      disk: float
-      network:
-        tx: float
-        rx: float
+# =============================================================================
+# Custom Pricing (optional - only if Railway changes prices)
+# =============================================================================
+# Uncomment to override built-in pricing rates
+
+# pricing:
+#   - name: hobby
+#     price:
+#       cpu: 0.000463      # USD per vCPU-minute
+#       memory: 0.000231   # USD per GB-minute
+#       disk: 0.000021     # USD per GB-minute
+#       network:
+#         tx: 0.10         # USD per GB egress
+#
+#   - name: pro
+#     price:
+#       cpu: 0.000231
+#       memory: 0.000116
+#       disk: 0.000021
+#       network:
+#         tx: 0.10

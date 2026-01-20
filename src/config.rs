@@ -30,7 +30,7 @@
 //! icon_cache:
 //!   enabled: true       # Enable icon caching (default: true)
 //!   max_count: 200      # Max icons to cache (default: 200)
-//!   mode: link          # "base64" = embed in JSON, "link" = serve from /static/icons/services/{name}
+//!   mode: link          # "base64" = embed in JSON, "link" = serve from /icons/services/{name}
 //!   max_age: 86400      # Browser cache TTL in seconds (for mode: link, default: 86400 = 1 day)
 //!
 //! pricing:

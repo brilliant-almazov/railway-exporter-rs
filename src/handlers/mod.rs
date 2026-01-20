@@ -7,15 +7,19 @@
 mod health;
 mod icons;
 mod metrics;
+mod static_files;
 mod status;
 
 #[cfg(test)]
 mod tests;
+#[cfg(test)]
+mod static_files_test;
 
 pub use health::handle as health;
 pub use icons::handle as icons;
 pub use metrics::handle_json as metrics_json;
 pub use metrics::handle_prometheus as metrics_prometheus;
+pub use static_files::handle as static_file;
 pub use status::handle as status;
 
 use crate::config::GzipConfig;

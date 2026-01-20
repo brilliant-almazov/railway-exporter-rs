@@ -56,9 +56,9 @@ const defaultTotals: FilteredTotals = {
 export function Dashboard({ apiHost, initialData, initialLang }: DashboardProps) {
   const { language, locale, dir, setLanguage } = useLanguage(initialLang)
   const isCompact = useCompactMode(50)
-  // Default to WebSocket if backend has it enabled
+  // Default to WebSocket enabled (server can override if ws is disabled)
   const [useWebSocket, setUseWebSocket] = useState(
-    () => initialData.serverStatus?.endpoints.websocket ?? false
+    () => initialData.serverStatus?.endpoints.websocket ?? true
   )
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null)
   const [justUpdated, setJustUpdated] = useState(false)

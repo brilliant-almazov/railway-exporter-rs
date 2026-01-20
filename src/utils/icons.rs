@@ -154,7 +154,7 @@ impl IconCache {
         join_all(futures).await;
     }
 
-    /// Gets raw icon data from cache (for serving via /static/icons endpoint).
+    /// Gets raw icon data from cache (for serving via /icons/services endpoint).
     /// Returns None if not cached - caller should trigger fetch first.
     pub async fn get_raw(&self, service_name: &str) -> Option<CachedIcon> {
         let mut cache = self.cache.lock().await;

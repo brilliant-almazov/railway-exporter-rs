@@ -41,6 +41,82 @@ Railway doesn't provide Prometheus metrics out of the box. This exporter fills t
 | 📊 **Breakdown** | Know which service is eating your budget |
 | 🔄 **Self-Monitoring** | The exporter tracks its own resource usage |
 
+## 📸 Screenshots
+
+### SpendPulse Dashboard
+
+Real-time cost monitoring with interactive filtering, sorting, and multi-language support.
+
+<details>
+<summary><b>🇬🇧 English Interface</b> — Default view with all services</summary>
+
+![Dashboard English](docs/images/dashboard-en.png)
+
+Main dashboard showing current spend ($1.15), monthly forecast ($10.31), daily average ($0.06), and network requests (28,800). Table displays per-service breakdown with CPU, RAM, Disk, and Network metrics.
+</details>
+
+<details>
+<summary><b>🇷🇺 Русский интерфейс</b> — Полная локализация</summary>
+
+![Dashboard Russian](docs/images/dashboard-ru.png)
+
+Дашборд на русском языке. Все метки, заголовки и числовые форматы адаптированы.
+</details>
+
+<details>
+<summary><b>🇺🇦 Українська</b> — З фільтром по групі</summary>
+
+![Dashboard Ukrainian](docs/images/dashboard-uk-filtered.png)
+
+Фільтрація по групі "messaging" — показує лише сервіси з обраної групи. Зверніть увагу на лічильник "Сервіси (1/7)".
+</details>
+
+<details>
+<summary><b>🇮🇱 עברית (RTL)</b> — With deleted services</summary>
+
+![Dashboard Hebrew Deleted](docs/images/dashboard-he-deleted.png)
+
+Right-to-left layout with "Show deleted" filter enabled. Deleted services appear with strikethrough styling and are included in totals.
+</details>
+
+<details>
+<summary><b>🇮🇱 עברית (RTL)</b> — Tooltip with raw values</summary>
+
+![Dashboard Hebrew Tooltip](docs/images/dashboard-he-tooltip.png)
+
+Hover tooltip showing precise values. Useful when displayed values are rounded (e.g., "< 0" for tiny amounts).
+</details>
+
+### Backend API
+
+<details>
+<summary><b>/status endpoint</b> — Server health and configuration</summary>
+
+![Backend Status](docs/images/backend-status.png)
+
+JSON response with version, uptime, endpoints status, pricing config, process info, and API scrape statistics.
+</details>
+
+### Grafana Integration (🚧 In Progress)
+
+Pre-built Grafana dashboards for visualizing Railway metrics.
+
+<details>
+<summary><b>📊 Dashboard Overview</b> — Main metrics visualization</summary>
+
+![Grafana Dashboard](docs/images/grafana-dashboard.png)
+
+Grafana dashboard displaying Railway metrics from Prometheus. Shows current usage, estimated monthly costs, and per-service breakdown.
+</details>
+
+<details>
+<summary><b>🔍 Query Editor</b> — PromQL queries for Railway metrics</summary>
+
+![Grafana Query](docs/images/grafana-query.png)
+
+Query editor showing how to fetch and visualize Railway metrics using PromQL. Includes examples of common queries.
+</details>
+
 ## 📊 Metrics
 
 ### Per-Service Metrics
@@ -73,137 +149,504 @@ Railway doesn't provide Prometheus metrics out of the box. This exporter fills t
 
 ## ⚙️ Configuration
 
-### Environment Variables
+Configuration is loaded from YAML file. Two methods are supported:
 
-| Variable | Required | Default | Description |
-|----------|:--------:|---------|-------------|
-| `RAILWAY_API_TOKEN` | ✅ | — | [Get token](https://railway.app/account/tokens) |
-| `RAILWAY_PROJECT_ID` | ✅ | — | [Find ID](https://docs.railway.app/guides/projects#project-id) |
-| `RAILWAY_PLAN` | ❌ | `hobby` | `hobby` or `pro` |
-| `SCRAPE_INTERVAL` | ❌ | `300` | API poll interval (60-3600 sec) |
-| `PORT` | ❌ | `9333` | HTTP port (1-65535) |
-| `RAILWAY_API_URL` | ❌ | See below | GraphQL endpoint |
-| `RUST_LOG` | ❌ | `info` | `error`/`warn`/`info`/`debug`/`trace` |
+| Method | Environment Variable | Use Case |
+|--------|---------------------|----------|
+| **File** | `CONFIG_FILE` | Local development, Docker volume mount |
+| **Base64** | `CONFIG_BASE64` | Docker, Kubernetes, Railway (single env var) |
 
-**Default API URL:** `https://backboard.railway.app/graphql/v2`
+**Priority:** `CONFIG_BASE64` > `CONFIG_FILE` > `./config.yaml`
 
-### Alternative: TOML Configuration
+### Complete config.yaml Reference
 
-You can use a TOML config file instead of individual environment variables.
+```yaml
+# =============================================================================
+# REQUIRED: Railway API Credentials
+# =============================================================================
 
-#### Option 1: Plain TOML (CONFIG_TOML)
+# API Token for authenticating with Railway GraphQL API
+# How to get: https://railway.app/account/tokens
+# Format: Token string (usually starts with alphanumeric characters)
+# Security: Keep this token secret! Never commit to version control.
+railway_api_token: "your-api-token-here"
 
-```bash
-export CONFIG_TOML='
-[railway]
-api_token = "railway_xxxxxxxx"
-project_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-plan = "pro"
+# Project ID to monitor
+# How to find:
+#   1. Open your project in Railway dashboard
+#   2. Go to Settings → General
+#   3. Copy "Project ID" (UUID format)
+# Or extract from URL: https://railway.app/project/{PROJECT_ID}
+railway_project_id: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 
-[server]
-port = 9333
-scrape_interval = 300
-'
+# =============================================================================
+# REQUIRED: Project Settings
+# =============================================================================
+
+# Display name for the project
+# Used in:
+#   - /status endpoint JSON response
+#   - Prometheus metrics labels
+#   - Dashboard header (if using SpendPulse)
+# If not specified, defaults to project_id value
+project_name: "My Railway Project"
+
+# Pricing plan determines cost calculation rates
+# Values: "hobby" | "pro"
+#
+# Hobby plan rates (per minute):
+#   CPU:     $0.000463/vCPU-minute
+#   Memory:  $0.000231/GB-minute
+#   Disk:    $0.000021/GB-minute
+#   Network: $0.10/GB egress
+#
+# Pro plan rates (per minute) - ~50% cheaper for CPU/Memory:
+#   CPU:     $0.000231/vCPU-minute
+#   Memory:  $0.000116/GB-minute
+#   Disk:    $0.000021/GB-minute
+#   Network: $0.10/GB egress
+#
+# IMPORTANT: Using wrong plan will produce incorrect cost estimates!
+railway_plan: pro
+
+# =============================================================================
+# OPTIONAL: Server Settings
+# =============================================================================
+
+# HTTP server port for all endpoints (/metrics, /health, /status, /ws, /api/metrics)
+# Default: 9090
+# Note: In Docker, use EXPOSE and port mapping (-p 9333:9090)
+port: 9090
+
+# Interval between Railway API scrapes in seconds
+# Default: 300 (5 minutes)
+# Valid range: 60-3600 (1 minute to 1 hour)
+#
+# Trade-offs:
+#   Lower interval (60s):
+#     + More responsive metrics
+#     + Better real-time monitoring
+#     - More API calls (may hit rate limits)
+#     - Slightly higher resource usage
+#
+#   Higher interval (600s+):
+#     + Fewer API calls
+#     + Lower resource usage
+#     - Less responsive to cost changes
+#
+# Recommendation: 300s for most use cases, 60s for real-time dashboards
+scrape_interval: 300
+
+# Railway GraphQL API URL
+# Default: https://backboard.railway.app/graphql/v2
+# Change only if Railway updates their API URL
+railway_api_url: https://backboard.railway.app/graphql/v2
+
+# Enable CORS (Cross-Origin Resource Sharing) headers
+# Default: true
+# When enabled, adds headers to allow requests from any origin:
+#   Access-Control-Allow-Origin: *
+#   Access-Control-Allow-Methods: GET, OPTIONS
+#   Access-Control-Allow-Headers: Content-Type
+#
+# Use cases:
+#   true  - Dashboard hosted on different domain (default, recommended)
+#   false - Same-origin deployment or reverse proxy handles CORS
+cors_enabled: true
+
+# Enable WebSocket endpoint (/ws) for real-time updates
+# Default: true
+# When enabled:
+#   - Clients can connect to /ws for push notifications
+#   - Metrics sent immediately after each API scrape
+#   - No polling needed, lower latency
+#
+# Protocol: WebSocket (ws:// or wss://)
+# Message format: JSON with type field ("metrics" | "status")
+#
+# Use cases:
+#   true  - Real-time dashboards, live cost monitoring
+#   false - Prometheus-only setup, resource-constrained environments
+websocket_enabled: true
+
+# =============================================================================
+# OPTIONAL: Service Groups
+# =============================================================================
+
+# Organize services into logical groups for filtering in dashboard
+# Format: Map of group_name -> list of service name patterns
+#
+# Pattern matching:
+#   - Case-insensitive substring match
+#   - "postgres" matches "postgres", "PostgreSQL", "my-postgres-db"
+#   - Order matters: first matching group wins
+#   - Services not matching any pattern get "default" group
+#
+# Tips:
+#   - Use unique substrings to avoid conflicts
+#   - Group names appear in dashboard dropdown
+#   - Empty list [] means the group exists but has no patterns
+service_groups:
+  # Infrastructure monitoring stack
+  monitoring:
+    - prometheus
+    - grafana
+    - victoria-metrics
+    - loki
+    - alertmanager
+
+  # Database services
+  database:
+    - postgres
+    - redis
+    - mysql
+    - mongodb
+    - clickhouse
+
+  # Message brokers and queues
+  messaging:
+    - rabbitmq
+    - kafka
+    - nats
+
+  # Networking and proxies
+  network:
+    - tailscale
+    - nginx
+    - traefik
+    - caddy
+
+  # Application services (example)
+  # backend:
+  #   - api
+  #   - worker
+  #   - scheduler
+
+# =============================================================================
+# OPTIONAL: Gzip Compression
+# =============================================================================
+
+# HTTP response compression settings
+# Reduces bandwidth usage for JSON responses
+gzip:
+  # Enable gzip compression
+  # Default: true
+  # Disable if: reverse proxy already handles compression
+  enabled: true
+
+  # Minimum response size in bytes to trigger compression
+  # Default: 256
+  # Rationale: Compression overhead not worth it for small responses
+  # Range: 0 to any (0 = compress everything)
+  #
+  # Typical response sizes:
+  #   /health:      ~2 bytes (no compression)
+  #   /status:      ~1-2 KB (compressed)
+  #   /api/metrics: ~5-50 KB depending on services (compressed)
+  min_size: 256
+
+  # Compression level (1-9)
+  # Default: 1
+  # MUST be between 1 and 9 (validated on startup)
+  #
+  # Level 1: Fastest, minimal CPU, ~60-70% compression ratio
+  # Level 5: Balanced, moderate CPU, ~75-80% compression ratio
+  # Level 9: Best compression, highest CPU, ~80-85% compression ratio
+  #
+  # Recommendations:
+  #   1-3: Real-time APIs, many requests, CPU-constrained
+  #   4-6: General purpose, balanced
+  #   7-9: Static content, bandwidth-constrained networks
+  level: 1
+
+# =============================================================================
+# OPTIONAL: Icon Cache
+# =============================================================================
+
+# Service icons are fetched from Railway API and cached locally
+# Icons are SVG format, typically 1-5 KB each
+icon_cache:
+  # Enable icon caching
+  # Default: true
+  # When disabled: no icons in /api/metrics response, saves memory
+  enabled: true
+
+  # Maximum number of icons to cache (LRU eviction)
+  # Default: 200
+  # Memory usage: ~1-5 KB per icon, 200 icons ≈ 0.5-1 MB
+  # Note: Deleted services' icons are still cached until evicted
+  max_count: 200
+
+  # Icon delivery mode
+  # Default: base64
+  # Values: "base64" | "link"
+  #
+  # MODE: base64
+  #   Icons embedded as data URIs in JSON: "icon": "data:image/svg+xml;base64,..."
+  #   Pros:
+  #     + Single HTTP request, all data in one response
+  #     + Works offline after initial load
+  #     + Simpler client code
+  #   Cons:
+  #     - Larger JSON payload (+30-50% per icon)
+  #     - Can't leverage browser image caching
+  #   Best for: Simple integrations, offline-first dashboards
+  #
+  # MODE: link
+  #   Icons served from separate endpoint: "icon": "{base_url}/static/icons/services/{name}"
+  #   Pros:
+  #     + Smaller JSON payload (~100 bytes per icon reference)
+  #     + Browser caches icons independently
+  #     + Better for slow connections
+  #   Cons:
+  #     - Multiple HTTP requests
+  #     - Requires base_url configuration
+  #   Best for: Web dashboards, bandwidth-constrained environments
+  mode: base64
+
+  # Browser cache TTL in seconds (only for mode: link)
+  # Default: 86400 (1 day)
+  # Adds Cache-Control header: max-age={max_age}
+  #
+  # Values:
+  #   3600   - 1 hour (icons change frequently)
+  #   86400  - 1 day (default, good balance)
+  #   604800 - 1 week (icons rarely change)
+  max_age: 86400
+
+  # Base URL for icon links (required if mode: link)
+  # Must include protocol and host, no trailing slash
+  #
+  # Examples:
+  #   Local dev:     "http://localhost:9090"
+  #   Production:    "https://exporter.yourdomain.com"
+  #   Railway:       "https://railway-exporter-production.up.railway.app"
+  #   Behind proxy:  "https://api.example.com/railway-exporter"
+  #
+  # Result: "{base_url}/static/icons/services/{service_name}"
+  base_url: ""
+
+# =============================================================================
+# OPTIONAL: Custom Pricing (override Railway defaults)
+# =============================================================================
+
+# Override built-in pricing rates
+# Use cases:
+#   - Railway updates pricing (update here until exporter is updated)
+#   - Custom calculations (e.g., internal cost allocation with markup)
+#   - Testing with different price scenarios
+#
+# Format: Array of pricing entries, each with name and price values
+# Note: Only the entry matching railway_plan is used for calculations
+#
+# Built-in defaults (as of January 2025):
+pricing:
+  # Hobby plan pricing
+  - name: hobby
+    price:
+      # CPU: USD per vCPU-minute
+      # 1 vCPU running for 1 hour = $0.000463 × 60 = $0.028/hour
+      # 1 vCPU running for 1 month = $0.028 × 24 × 30 = ~$20/month
+      cpu: 0.000463
+
+      # Memory: USD per GB-minute
+      # 1 GB RAM for 1 hour = $0.000231 × 60 = $0.014/hour
+      # 1 GB RAM for 1 month = $0.014 × 24 × 30 = ~$10/month
+      memory: 0.000231
+
+      # Disk: USD per GB-minute (persistent volume)
+      # 10 GB disk for 1 month = $0.000021 × 60 × 24 × 30 × 10 = ~$9/month
+      disk: 0.000021
+
+      # Network egress: USD per GB transferred out
+      # Ingress is free, only outbound traffic is charged
+      network:
+        tx: 0.10
+
+  # Pro plan pricing (recommended for production)
+  - name: pro
+    price:
+      # CPU: 50% cheaper than hobby
+      # 1 vCPU for 1 month = ~$10/month
+      cpu: 0.000231
+
+      # Memory: 50% cheaper than hobby
+      # 1 GB RAM for 1 month = ~$5/month
+      memory: 0.000116
+
+      # Disk: same as hobby
+      # 10 GB disk for 1 month = ~$9/month
+      disk: 0.000021
+
+      # Network: same as hobby
+      network:
+        tx: 0.10
 ```
 
-#### Option 2: Base64-encoded TOML (CONFIG_TOML_BASE64)
+### Configuration Validation
 
-Useful when your deployment platform doesn't support multi-line environment variables.
+The exporter validates configuration on startup:
 
-**Step 1: Create config.toml file**
-```toml
-[railway]
-api_token = "railway_abc123xyz"
-project_id = "550e8400-e29b-41d4-a716-446655440000"
-plan = "pro"
+| Field | Validation | Error if Invalid |
+|-------|------------|------------------|
+| `railway_api_token` | Required, non-empty | "Missing required config: railway_api_token" |
+| `railway_project_id` | Required, non-empty | "Missing required config: railway_project_id" |
+| `railway_plan` | Must be "hobby" or "pro" | "Invalid plan 'X': must be 'hobby' or 'pro'" |
+| `scrape_interval` | 60 ≤ value ≤ 3600 | "scrape_interval must be at least 60 seconds" |
+| `gzip.level` | 1 ≤ value ≤ 9 | "gzip.level must be between 1 and 9" |
 
-[server]
-port = 9333
-scrape_interval = 300
-```
+### Using Base64 Configuration
 
-**Step 2: Encode to Base64**
+For deployments where multi-line env vars aren't supported:
+
 ```bash
-# Linux/macOS
-cat config.toml | base64
+# Encode config.yaml to base64
+base64 -i config.yaml > config.b64
+
+# Set environment variable
+export CONFIG_BASE64=$(cat config.b64)
 
 # Or one-liner
-base64 -i config.toml
-
-# Output example:
-# W3JhaWx3YXldCmFwaV90b2tlbiA9ICJyYWlsd2F5X2FiYzEyM3h5eiIKcHJvamVjdF9pZCA9ICI1NTBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDAiCnBsYW4gPSAicHJvIgoKW3NlcnZlcl0KcG9ydCA9IDkzMzMKc2NyYXBlX2ludGVydmFsID0gMzAwCg==
+export CONFIG_BASE64=$(base64 -i config.yaml)
 ```
 
-**Step 3: Set environment variable**
-```bash
-export CONFIG_TOML_BASE64="W3JhaWx3YXldCmFwaV90b2tlbiA9ICJyYWlsd2F5X2FiYzEyM3h5eiIKcHJvamVjdF9pZCA9ICI1NTBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDAiCnBsYW4gPSAicHJvIgoKW3NlcnZlcl0KcG9ydCA9IDkzMzMKc2NyYXBlX2ludGVydmFsID0gMzAwCg=="
-```
+### Environment Variables
 
-**Step 4: Use in Docker**
-```bash
-docker run -d \
-  -p 9333:9333 \
-  -e CONFIG_TOML_BASE64="W3JhaWx3YXldCmFw...==" \
-  ghcr.io/brilliant-almazov/railway-exporter-rs:latest
-```
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `CONFIG_FILE` | `config.yaml` | Path to YAML config file |
+| `CONFIG_BASE64` | — | Base64-encoded YAML config |
+| `RUST_LOG` | `info` | Log level: `error`/`warn`/`info`/`debug`/`trace` |
 
-#### Why Base64?
+### Configuration Effects
 
-| Scenario | Use |
-|----------|-----|
-| Docker Compose | `CONFIG_TOML` (multi-line supported) |
-| Kubernetes Secrets | `CONFIG_TOML_BASE64` (binary-safe) |
-| CI/CD pipelines | `CONFIG_TOML_BASE64` (single-line) |
-| Railway deployment | Either works, but env vars are simpler |
-
-**Priority order:** Environment variables > TOML config > Defaults
-
-### Validation Rules
-
-| Variable | Validation |
-|----------|------------|
-| `RAILWAY_API_TOKEN` | Must not be empty |
-| `RAILWAY_PROJECT_ID` | Must not be empty |
-| `RAILWAY_PLAN` | Must be exactly `hobby` or `pro` (case-insensitive) |
-| `SCRAPE_INTERVAL` | Must be a positive integer |
-| `PORT` | Must be a valid port number (1-65535) |
+| Setting | Effect |
+|---------|--------|
+| `railway_plan` | Determines pricing rates for cost calculations |
+| `scrape_interval` | Lower = fresher data but more API calls |
+| `service_groups` | Enables group filtering in dashboard |
+| `gzip.level` | Higher = smaller responses but more CPU |
+| `icon_cache.mode: base64` | Larger JSON but fewer HTTP requests |
+| `icon_cache.mode: link` | Smaller JSON, better for slow connections |
+| `cors_enabled` | Required for cross-origin dashboard access |
+| `websocket_enabled` | Real-time updates without polling |
 
 ## 🚀 Quick Start
 
-### Docker
+### Step 1: Get Railway Credentials
+
+1. **Get API Token:**
+   - Go to [https://railway.app/account/tokens](https://railway.app/account/tokens)
+   - Click "Create Token"
+   - Copy the token (shown only once!)
+
+2. **Get Project ID:**
+   - Open your project in Railway dashboard
+   - Click Settings → General
+   - Copy the "Project ID" (UUID format)
+
+3. **Know your plan:**
+   - Check your account settings for `hobby` or `pro`
+
+### Step 2: Create config.yaml
+
+Create a minimal `config.yaml` file:
+
+```yaml
+# Minimal config.yaml - copy and fill in your values
+railway_api_token: "your-api-token-here"
+railway_project_id: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+project_name: "My Project"
+railway_plan: pro  # or "hobby"
+
+# Optional: organize services into groups
+service_groups:
+  database:
+    - postgres
+    - redis
+  monitoring:
+    - grafana
+    - prometheus
+```
+
+### Step 3: Run
+
+**Option A: Docker (Recommended)**
 
 ```bash
-# Use specific commit SHA for stability (recommended)
+# 1. Encode config to base64
+export CONFIG_BASE64=$(base64 -i config.yaml)
+
+# 2. Run container
 docker run -d \
   --name railway-exporter \
   -p 9333:9333 \
-  -e RAILWAY_API_TOKEN=your-token \
-  -e RAILWAY_PROJECT_ID=your-project-id \
-  -e RAILWAY_PLAN=pro \
-  ghcr.io/brilliant-almazov/railway-exporter-rs:bad9874
+  -e CONFIG_BASE64="$CONFIG_BASE64" \
+  -e RUST_LOG=info \
+  ghcr.io/brilliant-almazov/railway-exporter-rs:latest
 
-# Or use 'latest' for always up-to-date (less stable)
-# ghcr.io/brilliant-almazov/railway-exporter-rs:latest
+# 3. Check it's working
+curl http://localhost:9333/health
+# Should return: ok
+
+curl http://localhost:9333/status | jq .
+# Should return JSON with version, config, etc.
+```
+
+**Option B: Docker with config file mount**
+
+```bash
+docker run -d \
+  --name railway-exporter \
+  -p 9333:9333 \
+  -v $(pwd)/config.yaml:/config.yaml:ro \
+  -e CONFIG_FILE=/config.yaml \
+  -e RUST_LOG=info \
+  ghcr.io/brilliant-almazov/railway-exporter-rs:latest
+```
+
+**Option C: Binary (local development)**
+
+```bash
+# Build from source
+cargo build --release
+
+# Run with config in current directory
+./target/release/railway-exporter
+# Automatically loads ./config.yaml
+
+# Or specify config path
+CONFIG_FILE=/path/to/config.yaml ./target/release/railway-exporter
+
+# With debug logging
+RUST_LOG=debug ./target/release/railway-exporter
+```
+
+### Step 4: Verify
+
+```bash
+# Health check
+curl http://localhost:9333/health
+# → ok
+
+# Server status
+curl http://localhost:9333/status | jq .
+# → JSON with version, uptime, config
+
+# Prometheus metrics
+curl http://localhost:9333/metrics
+# → Prometheus format metrics
+
+# JSON metrics (for dashboard)
+curl http://localhost:9333/api/metrics | jq .
+# → JSON with project summary and services
 ```
 
 ### Deploy to Railway
 
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template?template=https://github.com/brilliant-almazov/railway-exporter-rs&envs=RAILWAY_API_TOKEN,RAILWAY_PROJECT_ID,RAILWAY_PLAN&RAILWAY_API_TOKENDesc=Railway+API+Token&RAILWAY_PROJECT_IDDesc=Project+ID+to+monitor&RAILWAY_PLANDesc=Pricing+plan&RAILWAY_PLANDefault=hobby)
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template?template=https://github.com/brilliant-almazov/railway-exporter-rs)
 
-Required environment variables:
-- `RAILWAY_API_TOKEN` — [Get your API token](https://railway.app/account/tokens)
-- `RAILWAY_PROJECT_ID` — Find in [Project Settings](https://docs.railway.app/guides/projects#project-id)
-- `RAILWAY_PLAN` — `hobby` (default) or `pro`
-
-### Binary
-
-```bash
-export RAILWAY_API_TOKEN=your-token
-export RAILWAY_PROJECT_ID=your-project-id
-export RAILWAY_PLAN=pro
-
-./railway-exporter
-```
+For Railway deployment, set the `CONFIG_BASE64` variable in service settings with your base64-encoded config.yaml.
 
 ## 🔨 Building from Source
 
@@ -212,26 +655,43 @@ export RAILWAY_PLAN=pro
 - [Rust](https://rustup.rs/) 1.70+
 - Docker (optional)
 
-### Build
+### Build and Run
 
 ```bash
+# Clone repository
 git clone https://github.com/brilliant-almazov/railway-exporter-rs.git
 cd railway-exporter-rs
 
-# Binary
+# Create config.yaml (see Configuration section above)
+cp config.yaml.example config.yaml
+# Edit config.yaml with your Railway credentials
+
+# Build and run
 cargo build --release
 ./target/release/railway-exporter
+# Server starts at http://localhost:9090 (or port from config)
 
-# Docker (~6.5 MB image)
+# Build Docker image (~6.5 MB)
 docker build -t railway-exporter .
+
+# Run Docker container
+docker run -d -p 9333:9090 \
+  -e CONFIG_BASE64=$(base64 -i config.yaml) \
+  railway-exporter
 ```
 
 ### Development
 
 ```bash
-cargo fmt      # Format
-cargo clippy   # Lint
-cargo test     # Test
+cargo fmt      # Format code
+cargo clippy   # Lint (catch common mistakes)
+cargo test     # Run all tests (154 tests)
+
+# Run with debug logging
+RUST_LOG=debug cargo run
+
+# Run specific test
+cargo test test_health_handler
 ```
 
 ## 📈 Prometheus & Grafana

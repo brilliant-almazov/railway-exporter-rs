@@ -1,14 +1,14 @@
-//! Static icons endpoint handler.
+//! Cached icons endpoint handler.
 //!
 //! Serves cached service icons with browser caching headers.
-//! GET /static/icons/{service_name}
+//! GET /icons/services/{service_name}
 
 use super::HandlerResponse;
 use crate::state::AppState;
 use hyper::body::Bytes;
 use hyper::{Response, StatusCode};
 
-/// GET /static/icons/{service_name} - Serve cached icon.
+/// GET /icons/services/{service_name} - Serve cached icon.
 ///
 /// Returns the icon image with proper Content-Type and caching headers:
 /// - Cache-Control: public, max-age={configured TTL}

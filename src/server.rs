@@ -114,11 +114,11 @@ async fn route_request(
                 handlers::metrics_prometheus(&state)
             }
         }
-        "/status" | "/" => handlers::status(&state).await,
+        "/status" => handlers::status(&state).await,
         "/health" => handlers::health(),
-        _ if path.starts_with("/static/icons/services/") => {
-            // Extract service name from path: /static/icons/services/{service_name}
-            let service_name = &path["/static/icons/services/".len()..];
+        _ if path.starts_with("/icons/services/") => {
+            // Extract service name from path: /icons/services/{service_name}
+            let service_name = &path["/icons/services/".len()..];
             if service_name.is_empty() {
                 handlers::not_found()
             } else {
@@ -128,7 +128,9 @@ async fn route_request(
                 handlers::icons(&state, &decoded).await
             }
         }
-        _ => handlers::not_found(),
+        // Static files: serve from /static directory (for combined image)
+        // Falls back to index.html for SPA routing
+        _ => handlers::static_file(path),
     };
 
     // Finalize: add CORS headers if enabled, gzip if configured, build response
