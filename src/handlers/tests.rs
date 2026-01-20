@@ -222,53 +222,56 @@ async fn test_status_handler_content_type() {
 }
 
 #[tokio::test]
-async fn test_status_handler_contains_version() {
+async fn test_status_handler_version() {
     let state = create_test_state();
     let (_builder, body) = status(&state).await;
 
-    let body_str = String::from_utf8_lossy(&body);
-    assert!(body_str.contains("version"));
+    let parsed: serde_json::Value = serde_json::from_slice(&body).unwrap();
+    assert_eq!(parsed["version"], env!("CARGO_PKG_VERSION"));
 }
 
 #[tokio::test]
-async fn test_status_handler_contains_endpoints() {
+async fn test_status_handler_endpoints() {
     let state = create_test_state();
     let (_builder, body) = status(&state).await;
 
-    let body_str = String::from_utf8_lossy(&body);
-    assert!(body_str.contains("endpoints"));
-    assert!(body_str.contains("prometheus"));
-    assert!(body_str.contains("json"));
-    assert!(body_str.contains("health"));
+    let parsed: serde_json::Value = serde_json::from_slice(&body).unwrap();
+    assert_eq!(parsed["endpoints"]["prometheus"], true);
+    assert_eq!(parsed["endpoints"]["json"], true);
+    assert_eq!(parsed["endpoints"]["health"], true);
+    assert_eq!(parsed["endpoints"]["websocket"], true);
 }
 
 #[tokio::test]
-async fn test_status_handler_contains_config() {
+async fn test_status_handler_config() {
     let state = create_test_state();
     let (_builder, body) = status(&state).await;
 
-    let body_str = String::from_utf8_lossy(&body);
-    assert!(body_str.contains("config"));
-    assert!(body_str.contains("plan"));
-    assert!(body_str.contains("scrape_interval_seconds"));
+    let parsed: serde_json::Value = serde_json::from_slice(&body).unwrap();
+    assert_eq!(parsed["config"]["plan"], "hobby");
+    assert_eq!(parsed["config"]["scrape_interval_seconds"], 60);
+    assert_eq!(parsed["config"]["api_url"], "https://backboard.railway.app/graphql/v2");
 }
 
 #[tokio::test]
-async fn test_status_handler_contains_process_info() {
+async fn test_status_handler_process_info() {
     let state = create_test_state();
     let (_builder, body) = status(&state).await;
 
-    let body_str = String::from_utf8_lossy(&body);
-    assert!(body_str.contains("process"));
+    let parsed: serde_json::Value = serde_json::from_slice(&body).unwrap();
+    assert!(parsed["process"]["pid"].is_u64());
+    assert!(parsed["process"]["memory_mb"].is_f64());
+    assert!(parsed["process"]["cpu_percent"].is_f64());
 }
 
 #[tokio::test]
-async fn test_status_handler_contains_api_status() {
+async fn test_status_handler_api_status() {
     let state = create_test_state();
     let (_builder, body) = status(&state).await;
 
-    let body_str = String::from_utf8_lossy(&body);
-    assert!(body_str.contains("api"));
-    assert!(body_str.contains("total_scrapes"));
-    assert!(body_str.contains("failed_scrapes"));
+    let parsed: serde_json::Value = serde_json::from_slice(&body).unwrap();
+    assert_eq!(parsed["api"]["total_scrapes"], 0);
+    assert_eq!(parsed["api"]["failed_scrapes"], 0);
+    assert!(parsed["api"]["last_success"].is_null());
+    assert!(parsed["api"]["last_error"].is_null());
 }

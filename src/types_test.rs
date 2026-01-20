@@ -3,8 +3,8 @@
 use crate::config::{NetworkPricing, PriceValues};
 use crate::types::{
     ApiStatus, ConfigStatus, EndpointStatus, EstimatedData, EstimatedItem, GraphQLRequest,
-    GraphQLResponse, MetricsJson, ProcessStatus, Project, ProjectData, ProjectSummary,
-    ServerStatus, ServiceData, UsageData, UsageItem, WsMessage, WsStatus,
+    GraphQLResponse, IconCacheStatusConfig, MetricsJson, ProcessStatus, Project, ProjectData,
+    ProjectSummary, ServerStatus, ServiceData, UsageData, UsageItem, WsMessage, WsStatus,
 };
 
 // =============================================================================
@@ -219,7 +219,13 @@ fn test_server_status_serialize() {
                 }),
             },
             gzip: crate::config::GzipConfig::default(),
-            icon_cache: crate::config::IconCacheConfig::default(),
+            icon_cache: IconCacheStatusConfig {
+                enabled: true,
+                mode: crate::config::IconMode::Base64,
+                max_count: Some(200),
+                max_age: None,
+                base_url: None,
+            },
         },
         process: ProcessStatus {
             pid: 12345,
@@ -232,7 +238,7 @@ fn test_server_status_serialize() {
             total_scrapes: 50,
             failed_scrapes: 1,
         },
-        icon_cache: crate::utils::IconCacheStats::default(),
+        icon_cache: Some(crate::utils::IconCacheStats::default()),
     };
 
     let json = serde_json::to_string(&status).unwrap();
