@@ -20,6 +20,7 @@ export function Tooltip({
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    // eslint-disable-next-line react-compiler/react-compiler
     setMounted(true)
   }, [])
 
